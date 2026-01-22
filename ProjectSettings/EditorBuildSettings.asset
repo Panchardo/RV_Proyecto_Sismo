@@ -4,6 +4,9 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/Pancho_test.unity
+    guid: cbdf89a58ef351f4eb2ed5bbe8b6d018
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 57f9f078b093d034caafc8f48dff1828, type: 2}
