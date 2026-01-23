@@ -1,64 +1,74 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // Necesario para habilitar el dispositivo en el nuevo sistema
+using System.Collections; // Necesario para la Coroutine
 
-public class GiroscopioManual : MonoBehaviour
+public class GiroscopioKickstart : MonoBehaviour
 {
-    private bool giroSoportado;
     private Quaternion rotacionInicial;
+    private bool sensorActivo = false;
 
-    void Start()
+    IEnumerator Start()
     {
-        // 1. INTENTO DE DESPERTAR EL SENSOR (Nuevo Input System)
-        // Esto es clave: le decimos explícitamente al sistema nuevo que active el giroscopio
-        if (UnityEngine.InputSystem.Gyroscope.current != null) {
-            InputSystem.EnableDevice(UnityEngine.InputSystem.Gyroscope.current);
-        }
+        // 1. ESPERA DE SEGURIDAD (Wait-for-Init)
+        // Le damos 1 segundo a Android para que termine de cargar la Activity
+        yield return new WaitForSeconds(1.0f);
 
-        // 2. CONFIGURACIÓN ESTÁNDAR (Legacy)
-        giroSoportado = SystemInfo.supportsGyroscope;
+        // 2. CONFIGURACIÓN DEL SAMPLING
+        // Forzamos al sensor a leer 60 veces por segundo (0.016 segs)
+        // Sin esto, algunos Motorola se quedan esperando.
+        Input.gyro.updateInterval = 0.0167f;
 
-        if (giroSoportado)
+        // 3. ENCENDIDO
+        if (SystemInfo.supportsGyroscope)
         {
-            // Usamos "UnityEngine.Input" para que no se confunda con el InputSystem
-            UnityEngine.Input.gyro.enabled = true;
+            Input.gyro.enabled = true;
+            sensorActivo = true;
             
-            // Ajuste de rotación para compensar la diferencia entre Android y Unity (90 grados)
-            rotacionInicial = new Quaternion(0, 0, 1, 0); 
+            // Calibramos
+            rotacionInicial = new Quaternion(0, 0, 1, 0);
         }
     }
 
     void Update()
     {
-        // --- OPCIÓN A: GIROSCOPIO DEL CELULAR ---
-        if (giroSoportado && UnityEngine.Input.gyro.enabled)
+        if (sensorActivo)
         {
-            // Leemos la actitud usando la librería clásica (que se lleva mejor con Remote)
-            Quaternion rot = UnityEngine.Input.gyro.attitude;
-            
-            // Filtro: Solo aplicamos si la rotación no es cero absoluto (data válida)
-            if (rot.x != 0 || rot.y != 0 || rot.z != 0 || rot.w != 0) 
+            // Leemos
+            Quaternion rot = Input.gyro.attitude;
+
+            // FILTRO DE CEROS (Data Validity Check)
+            // Un Quaternion (0,0,0,0) es matemáticamente imposible (error).
+            // La identidad es (0,0,0,1).
+            if (rot.x != 0 || rot.y != 0 || rot.z != 0 || rot.w != 0)
             {
-                // Mapeo de coordenadas: Invertimos Z y W para Unity
+                // Si entra acá, es que HAY datos reales
                 transform.localRotation = rotacionInicial * new Quaternion(rot.x, rot.y, -rot.z, -rot.w);
             }
         }
+    }
 
-        // --- OPCIÓN B: MOUSE + ALT (RESPALDO PC) ---
-        // Esto funciona siempre, tengas o no celular conectado
-        if (Input.GetKey(KeyCode.LeftAlt) || Input.GetKey(KeyCode.RightAlt))
+    void OnGUI()
+    {
+        GUI.color = Color.white;
+        GUI.skin.label.fontSize = 40;
+
+        GUILayout.Label("Soporte Gyro: " + SystemInfo.supportsGyroscope);
+        GUILayout.Label("Status Activo: " + sensorActivo);
+        
+        // DEBUG DE DATOS
+        if (Input.gyro.attitude.x == 0 && Input.gyro.attitude.y == 0 && Input.gyro.attitude.z == 0 && Input.gyro.attitude.w == 0)
         {
-            float mouseX = Input.GetAxis("Mouse X") * 2.0f;
-            float mouseY = Input.GetAxis("Mouse Y") * 2.0f;
-            
-            // Rotamos el cuerpo o la cámara manualmente
-            transform.Rotate(Vector3.up, mouseX, Space.World);
-            transform.Rotate(Vector3.left, mouseY, Space.Self);
+            GUI.color = Color.red;
+            GUILayout.Label("GYRO MUERTO (0,0,0,0)");
+        }
+        else
+        {
+            GUI.color = Color.green;
+            GUILayout.Label("GYRO VIVO: " + Input.gyro.attitude);
         }
 
-        // --- DEBUG OPTIMIZADO ---
-        // Imprime solo 1 vez por segundo (aprox) para no saturar el USB
-        if (Time.frameCount % 60 == 0) { 
-            Debug.Log("Giro activo: " + giroSoportado + " | Datos: " + UnityEngine.Input.gyro.attitude);
-        }
+        // CONTROL CRUZADO: ACELERÓMETRO
+        // Si esto se mueve, el Input System anda bien.
+        GUI.color = Color.yellow;
+        GUILayout.Label("Accel Test: " + Input.acceleration);
     }
 }

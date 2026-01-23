@@ -21,6 +21,7 @@
 *.mdb
 *.opendb
 *.VC.db
+*.apk
 
 # Archivos temporales de Mac/Windows
 .DS_Store
