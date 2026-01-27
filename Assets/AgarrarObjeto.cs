@@ -1,60 +1,98 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class AgarrarObjeto : MonoBehaviour
 {
-    public float distanciaAlcance = 3f; // Qué tan lejos podés alcanzar
-    private GameObject objetoAgarrado;
+    [Header("Ajustes de Agarre")]
+    public float distanciaAlcance = 3f;
     public float potencia = 10.0f;
-    public Transform puntoSujecion; // Un objeto vacío hijo de la cámara donde irá el cubo
+    public Transform puntoSujecion; 
+    
+    [Header("Referencia Visual")]
+    public GameObject miraEsfera;
+    private Renderer miraRenderer;
+    private float offsetSuperficie = 0.05f; 
+
+    // Variables internas
+    private GameObject objetoAgarrado;
     private Rigidbody rbObjeto;
-    public Image miraPuntero;
+    private int capaOriginal; // Para recordar en qué capa estaba el objeto
+    
+    void Start()
+    {
+        if (miraEsfera != null)
+            miraRenderer = miraEsfera.GetComponent<Renderer>();
+    }
 
     void Update()
     {
+        // === PARTE 1: SI NO TENEMOS NADA ===
         if(objetoAgarrado == null)
         {
             EscanearEntorno();
         }
+        // === PARTE 2: SI TENEMOS ALGO AGARRADO ===
         else
         {
-             miraPuntero.color = Color.white; 
-        }
-        // Si presionás el botón de disparo (gatillo o botón principal)
-        if (Input.GetButtonDown("Fire1")) 
-        {
-            if (objetoAgarrado == null) {
-                IntentarAgarrar();
-            } else {
-                Soltar();
-            }
+            MoverObjetoSinAtravesarParedes();
+            
+            // UI: Ponemos la mira blanca (o apagada)
+            PintarMira(Color.white);
+            ResetearPosicionMira();
         }
 
-        // Si tenemos algo agarrado, que siga la posición del punto de sujeción
-        if (objetoAgarrado != null)
+        // INPUT
+        if (Input.GetButtonDown("Fire1")) 
         {
-            objetoAgarrado.transform.position = puntoSujecion.position;
-            objetoAgarrado.transform.rotation = puntoSujecion.rotation;
-            
+            if (objetoAgarrado == null) IntentarAgarrar();
+            else Soltar();
         }
     }
 
+    // --- NUEVA LÓGICA DE MOVIMIENTO ---
+    void MoverObjetoSinAtravesarParedes()
+    {
+        Vector3 destinoIdeal = puntoSujecion.position;
+        RaycastHit hitObstaculo;
 
+        // Trazamos una línea desde los ojos (transform.position) hasta la mano (destinoIdeal)
+        // El objeto agarrado NO estorba porque lo pusimos en "Ignore Raycast" al agarrarlo.
+        if (Physics.Linecast(transform.position, destinoIdeal, out hitObstaculo))
+        {
+            // ¡CHOQUE! Hay una pared o suelo entre mi cara y mi mano.
+            // Ponemos el objeto justo donde chocó el rayo.
+            objetoAgarrado.transform.position = hitObstaculo.point;
+            
+            // Opcional: Acomodar la rotación para que no se vea raro
+            objetoAgarrado.transform.rotation = puntoSujecion.rotation;
+        }
+        else
+        {
+            // CAMINO LIBRE: El objeto va a la mano normalmente.
+            objetoAgarrado.transform.position = destinoIdeal;
+            objetoAgarrado.transform.rotation = puntoSujecion.rotation;
+        }
+    }
 
     void IntentarAgarrar()
     {
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, distanciaAlcance))
-        {
-            // 1. Buscamos el Rigidbody UNA SOLA VEZ y guardamos la referencia (el cable)
-            rbObjeto = hit.collider.GetComponent<Rigidbody>();
+        // Solo agarramos cosas en capas normales (excluyendo Ignore Raycast para evitar bugs)
+        int layerMask = ~LayerMask.GetMask("Ignore Raycast");
 
-            // Si el cable conectó con algo (existe el rigidbody)...
-            if (rbObjeto != null)
+        if (Physics.Raycast(transform.position, transform.forward, out hit, distanciaAlcance, layerMask))
+        {
+            rbObjeto = hit.collider.GetComponent<Rigidbody>();
+            
+            // Check de seguridad: que tenga RB y no sea la mira
+            if (rbObjeto != null && hit.collider.gameObject != miraEsfera) 
             {
                 objetoAgarrado = hit.collider.gameObject;
                 
-                // 2. Usamos la referencia. Esto afecta al objeto real inmediatamente.
+                // GUARDAMOS EL ESTADO ORIGINAL
+                capaOriginal = objetoAgarrado.layer;
+                // CAMBIAMOS A CAPA "IGNORE RAYCAST" (Layer 2 por defecto en Unity)
+                objetoAgarrado.layer = 2; 
+
                 rbObjeto.isKinematic = true; 
             }
         }
@@ -62,40 +100,53 @@ public class AgarrarObjeto : MonoBehaviour
 
     void Soltar()
     {
-        // Como ya tenemos el cable conectado en 'rbObjeto', lo usamos directo.
-        rbObjeto.isKinematic = false; 
-        rbObjeto.AddForce(transform.forward * potencia, ForceMode.Impulse);
-        
-        // Limpiamos todo
+        if (rbObjeto != null)
+        {
+            // RESTAURAMOS TODO
+            objetoAgarrado.layer = capaOriginal; // Vuelve a su capa original
+            rbObjeto.isKinematic = false; 
+            
+            // Lanzamos con fuerza
+            rbObjeto.AddForce(transform.forward * potencia, ForceMode.Impulse);
+        }
         objetoAgarrado = null;
-        rbObjeto = null; // Cortamos el cable para no quedarnos conectados a la nada
+        rbObjeto = null;
     }
+
     void EscanearEntorno()
     {
-        RaycastHit hitScan;
+        if (miraEsfera == null) return;
 
-        // Lanzamos el rayo. Fondealo igual que en IntentarAgarrar
-        if (Physics.Raycast(transform.position, transform.forward, out hitScan, distanciaAlcance))
+        RaycastHit hitScan;
+        // Excluir capa Ignore Raycast del escaneo también
+        int layerMask = ~LayerMask.GetMask("Ignore Raycast");
+
+        if (Physics.Raycast(transform.position, transform.forward, out hitScan, distanciaAlcance, layerMask))
         {
-            // EL DESAFÍO:
-            // Chequeá si hitScan.collider tiene un Rigidbody attached.
-            // SI TIENE: Poné miraPuntero.color = Color.green;
-            // SI NO TIENE (es una pared): Poné miraPuntero.color = Color.white;
-            
-            // Pista: Es casi el mismo IF que usaste en IntentarAgarrar()
+             miraEsfera.transform.position = hitScan.point + (hitScan.normal * offsetSuperficie);
+             miraEsfera.transform.rotation = Quaternion.LookRotation(hitScan.normal);
+
              if (hitScan.collider.GetComponent<Rigidbody>() != null)
-             {
-                 miraPuntero.color = Color.green;
-             }
+                 PintarMira(Color.green);
              else
-             {
-                 miraPuntero.color = Color.white;
-             }
+                 PintarMira(Color.white);
         }
         else
         {
-            // Si el rayo no toca nada (estás mirando al cielo), volvé a BLANCO
-             miraPuntero.color = Color.white;
+             ResetearPosicionMira();
+             PintarMira(Color.white);
         }
+    }
+    
+    void ResetearPosicionMira()
+    {
+        if (miraEsfera == null) return;
+        miraEsfera.transform.position = transform.position + (transform.forward * distanciaAlcance);
+        miraEsfera.transform.LookAt(transform.position);
+    }
+
+    void PintarMira(Color color)
+    {
+        if (miraRenderer != null) miraRenderer.material.color = color;
     }
 }
