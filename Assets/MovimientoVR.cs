@@ -1,60 +1,77 @@
 using UnityEngine;
 
-// Esto obliga a que el objeto tenga sí o sí un CharacterController
 [RequireComponent(typeof(CharacterController))]
 public class MovimientoVR : MonoBehaviour
 {
-    
-    public float velocidad = 3.0f;
+    [Header("Configuración Básica")]
+    public float velocidad = 3.0f; // Controlada por el otro script (ControlCabeza)
     public Transform camaraTransform; 
+
+    [Header("Física de Salto")]
+    public float fuerzaGravedad = -9.81f;
+    public float alturaSalto = 1.2f; // Altura en metros (saltás 1 metro y pico)
     
-    // Referencia interna al motor físico
+    // Variables internas del motor físico
     private CharacterController characterController;
+    private Vector3 velocidadVertical; // Acá guardamos la inercia de caída/subida
+    private bool estaEnElSuelo;
 
     void Start()
     {
-        // Buscamos el componente automáticamente
         characterController = GetComponent<CharacterController>();
-        
-        // Forzar giroscopio (por si acaso)
         Input.gyro.enabled = true; 
     }
 
     void Update()
     {
-        // SEGURIDAD: Referencia a la cámara
+        // Seguridad por si perdiste la cámara en la mudanza
         if (camaraTransform == null) {
             if (Camera.main != null) camaraTransform = Camera.main.transform;
             else return;
         }
 
-        // 1. LEER INPUTS
+        // 1. CHEQUEO DE PISO (¿Estamos tocando el suelo?)
+        estaEnElSuelo = characterController.isGrounded;
+
+        if (estaEnElSuelo && velocidadVertical.y < 0)
+        {
+            // Si tocamos piso, reseteamos la caída. 
+            // Ponemos -2f en vez de 0 para asegurar que el sensor detecte el suelo siempre.
+            velocidadVertical.y = -2f;
+        }
+
+        // 2. MOVIMIENTO HORIZONTAL (Caminar)
         float moverX = Input.GetAxis("Horizontal");
         float moverZ = Input.GetAxis("Vertical");
 
-        // 2. CALCULAR DIRECCIÓN (Basado en a dónde mirás)
         Vector3 frente = camaraTransform.forward;
         Vector3 derecha = camaraTransform.right;
 
-        // Aplanamos para no volar hacia arriba si mirás el cielo
+        // Aplanamos vectores (para no volar hacia el cielo si mirás arriba)
         frente.y = 0;
         derecha.y = 0;
         frente.Normalize();
         derecha.Normalize();
 
-        // Vector de movimiento deseado
-        Vector3 deseoDeMovimiento = (frente * moverZ) + (derecha * moverX);
+        // Calculamos hacia dónde queremos ir caminando
+        Vector3 movimientoCaminata = (frente * moverZ) + (derecha * moverX);
+        
+        // Mover el personaje (Plano Horizontal)
+        characterController.Move(movimientoCaminata * velocidad * Time.deltaTime);
 
-        // 3. APLICAR GRAVEDAD SIMPLE
-        // El CharacterController no tiene gravedad por defecto. 
-        // Le agregamos un empujoncito constante para abajo para que no flote si sube un escalón.
-        deseoDeMovimiento.y = -9.8f; 
-
-        // 4. MOVER USANDO FÍSICA
-        // Move() respeta las paredes. Si chocás, te frena.
-        if (deseoDeMovimiento.magnitude > 0.1f || !characterController.isGrounded)
+        // 3. LOGICA DE SALTO (Plano Vertical)
+        // Input.GetButtonDown("Jump") suele ser la ESPACIADORA o el botón "X/A" del Joystick
+        if (Input.GetButtonDown("Jump") && estaEnElSuelo)
         {
-            characterController.Move(deseoDeMovimiento * velocidad * Time.deltaTime);
+            // Fórmula física real: V = Raíz(Altura * -2 * Gravedad)
+            velocidadVertical.y = Mathf.Sqrt(alturaSalto * -2f * fuerzaGravedad);
         }
+
+        // 4. APLICAR GRAVEDAD (Caída)
+        // La gravedad acelera con el tiempo (Time.deltaTime)
+        velocidadVertical.y += fuerzaGravedad * Time.deltaTime;
+
+        // Mover el personaje (Eje Y)
+        characterController.Move(velocidadVertical * Time.deltaTime);
     }
 }

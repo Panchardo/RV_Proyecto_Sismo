@@ -423,8 +423,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44364726df35e8942b27f3c08795ec1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  magnitud: 0.2
-  posicionOriginal: {x: 0, y: 0, z: 0}
 --- !u!114 &621066925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -988,8 +986,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44364726df35e8942b27f3c08795ec1c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  magnitud: 0.2
-  posicionOriginal: {x: 0, y: 0, z: 0}
 --- !u!114 &963194233
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1493,6 +1489,14 @@ PrefabInstance:
       propertyPath: debrisAmount
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8691317156095212740, guid: 755ee32b773522244b5669c29d5ebd96, type: 3}
+      propertyPath: audioClips.Array.size
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8691317156095212740, guid: 755ee32b773522244b5669c29d5ebd96, type: 3}
+      propertyPath: audioClips.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: bc63c90002a612a43bcbe7de59abd4eb, type: 3}
     - target: {fileID: 8691317156095212741, guid: 755ee32b773522244b5669c29d5ebd96, type: 3}
       propertyPath: m_Mass
       value: 10
