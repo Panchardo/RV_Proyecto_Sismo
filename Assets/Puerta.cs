@@ -7,6 +7,10 @@ public class PuertaInteractiva : MonoBehaviour
     private bool abierta = false;
     private Quaternion rotacionCerrada;
     private Quaternion rotacionAbierta;
+    [Header("Sonidos")]
+    public AudioClip sonidoAbrir;
+    public AudioClip sonidoCerrar;
+    public AudioSource parlante;
 
     void Start()
     {
@@ -27,5 +31,19 @@ public class PuertaInteractiva : MonoBehaviour
     public void AlternarPuerta()
     {
         abierta = !abierta;
+        
+        // --- LÓGICA DE AUDIO ---
+        if (parlante != null)
+        {
+           
+            // Si estaba por abrir, ponemos el audio de abrir, sino el de cerrar
+            AudioClip clipATocar = abierta ? sonidoAbrir : sonidoCerrar;
+            
+            if (clipATocar != null)
+            {
+ 
+                parlante.PlayOneShot(clipATocar);
+            }
+        }
     }
 }
