@@ -76,23 +76,25 @@ public class AgarrarObjeto : MonoBehaviour
     void IntentarAgarrar()
     {
         RaycastHit hit;
-        // Solo agarramos cosas en capas normales (excluyendo Ignore Raycast para evitar bugs)
         int layerMask = ~LayerMask.GetMask("Ignore Raycast");
 
         if (Physics.Raycast(transform.position, transform.forward, out hit, distanciaAlcance, layerMask))
         {
+            // --- NUEVA LÓGICA DE PUERTA ---
+            // Intentamos ver si lo que tocamos es una puerta
+            if (hit.collider.TryGetComponent(out PuertaInteractiva puerta))
+            {
+                puerta.AlternarPuerta(); // ¡La abrimos/cerramos!
+                return; // Salimos de la función para no intentar "agarrar" la puerta
+            }
+
+            // --- LÓGICA DE AGARRE (La que ya tenías) ---
             rbObjeto = hit.collider.GetComponent<Rigidbody>();
-            
-            // Check de seguridad: que tenga RB y no sea la mira
             if (rbObjeto != null && hit.collider.gameObject != miraEsfera) 
             {
                 objetoAgarrado = hit.collider.gameObject;
-                
-                // GUARDAMOS EL ESTADO ORIGINAL
                 capaOriginal = objetoAgarrado.layer;
-                // CAMBIAMOS A CAPA "IGNORE RAYCAST" (Layer 2 por defecto en Unity)
                 objetoAgarrado.layer = 2; 
-
                 rbObjeto.isKinematic = true; 
             }
         }
