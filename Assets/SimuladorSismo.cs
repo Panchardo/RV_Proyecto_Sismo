@@ -7,6 +7,7 @@ public class SimuladorSismo : MonoBehaviour
 
     void Start()
     {
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
         // 1. Llenamos el array automáticamente al iniciar el juego
         // FindObjectsOfType busca CADA objeto en la escena que tenga Rigidbody
         objetosAfectados = FindObjectsOfType<Rigidbody>();
