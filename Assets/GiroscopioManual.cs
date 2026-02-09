@@ -23,9 +23,13 @@ public class GiroscopioKickstart : MonoBehaviour
             Input.gyro.enabled = true;
             sensorActivo = true;
             
-            // Calibramos
-            rotacionInicial = new Quaternion(0, 0, 1, 0);
+            // Esperamos un frame extra para que el attitude no sea (0,0,0,0)
+            yield return new WaitForEndOfFrame();
+            
+            // Calibramos dinámicamente según cómo estás sosteniendo el celu
+            CalibrarHaciaAdelante();
         }
+        
     }
 
     void Update()
@@ -70,5 +74,19 @@ public class GiroscopioKickstart : MonoBehaviour
         // Si esto se mueve, el Input System anda bien.
         GUI.color = Color.yellow;
         GUILayout.Label("Accel Test: " + Input.acceleration);
+        if (GUILayout.Button("RE-CALIBRAR VISTA", GUILayout.Height(100)))
+        {
+            CalibrarHaciaAdelante();
+        }
+    }
+    public void CalibrarHaciaAdelante()
+    {
+        // 1. Leemos la orientación actual del sensor
+        Quaternion rotacionActualDelSensor = Input.gyro.attitude;
+
+        // 2. La invertimos. Al multiplicar la inversión por la rotación nueva en Update,
+        // el resultado inicial será (0,0,0,1), o sea, mirar al frente.
+        rotacionInicial = Quaternion.Inverse(new Quaternion(rotacionActualDelSensor.x, rotacionActualDelSensor.y, -rotacionActualDelSensor.z, -rotacionActualDelSensor.w));
     }
 }
+
