@@ -13457,7 +13457,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   velocidad: 5
-  camaraTransform: {fileID: 158493263}
+  camaraTransform: {fileID: 890991596}
   fuerzaGravedad: -9.81
   alturaSalto: 0.8
 --- !u!4 &1335992928
