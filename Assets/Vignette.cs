@@ -1,38 +1,45 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class VignetteController : MonoBehaviour
+public class VignetteSismo : MonoBehaviour
 {
-    [Header("Referencias")]
-    public CharacterController playerController;
-    public Image mascaraIzquierda;
-    public Image mascaraDerecha;
+    public Image[] mascaras; // Arrastrá las dos imágenes acá
+    
+    [Header("Configuración de Opacidad")]
+    [Range(0, 1)] public float opacidadMin = 0.4f; // Casi transparente al estar quieto
+    [Range(0, 1)] public float opacidadMax = 1.0f; // Negro total al moverse
 
-    [Header("Configuracion")]
-    public float velocidadMax = 5.0f; // Ajustala a la de tu MovimientoVR.cs
-    public float escalaMin = 1.0f;    // Tamaño normal
-    public float escalaMax = 1.8f;    // Cuanto más grande, más se cierra el túnel
+    [Header("Sensibilidad")]
+    public float suavizado = 5f; // Qué tan rápido reacciona el cambio
+
+    private float alphaObjetivo;
+    private float alphaActual;
 
     void Update()
     {
-        // 1. Obtenemos la velocidad actual del jugador
-        float velocidadActual = playerController.velocity.magnitude;
-
-        // 2. Normalizamos el valor entre 0 y 1
-        float t = Mathf.Clamp01(velocidadActual / velocidadMax);
-
-        // 3. Calculamos la escala (Interpolación lineal)
-        float nuevaEscala = Mathf.Lerp(escalaMin, escalaMax, t);
-
-        // 4. Aplicamos a ambos ojos
-        Vector3 escalaFinal = new Vector3(nuevaEscala, nuevaEscala, 1f);
-        mascaraIzquierda.transform.localScale = escalaFinal;
-        mascaraDerecha.transform.localScale = escalaFinal;
+        // LEEMOS EL JOYSTICK DIRECTAMENTE (Igual que en MovimientoVR.cs)
+        float moverX = Input.GetAxis("Horizontal");
+        float moverZ = Input.GetAxis("Vertical");
         
-        // Opcional: También podemos subir la opacidad (Alpha) al movernos
-        Color tempColor = mascaraIzquierda.color;
-        tempColor.a = Mathf.Lerp(0.6f, 1.0f, t); // 0.6 es un poco transparente, 1 es negro total
-        mascaraIzquierda.color = tempColor;
-        mascaraDerecha.color = tempColor;
+        // Calculamos la magnitud del empuje del stick (0 a 1)
+        float inputMagnitude = new Vector2(moverX, moverZ).magnitude;
+        inputMagnitude = Mathf.Clamp01(inputMagnitude);
+
+        // Si saltás, también podrías querer que se cierre (opcional)
+        // if (Input.GetButton("Jump")) inputMagnitude = 1f;
+
+        // Determinamos a qué transparencia queremos llegar
+        alphaObjetivo = Mathf.Lerp(opacidadMin, opacidadMax, inputMagnitude);
+
+        // Suavizamos el cambio para que no sea un parpadeo brusco
+        alphaActual = Mathf.MoveTowards(alphaActual, alphaObjetivo, suavizado * Time.deltaTime);
+
+        // Aplicamos a las dos cámaras
+        foreach (Image img in mascaras)
+        {
+            Color c = img.color;
+            c.a = alphaActual;
+            img.color = c;
+        }
     }
 }
