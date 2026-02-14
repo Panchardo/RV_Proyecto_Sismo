@@ -48,26 +48,19 @@ public class AgarrarObjeto : MonoBehaviour
         }
     }
 
-    // --- NUEVA LÓGICA DE MOVIMIENTO ---
+    // --- LÓGICA DE MOVIMIENTO ---
     void MoverObjetoSinAtravesarParedes()
     {
         Vector3 destinoIdeal = puntoSujecion.position;
         RaycastHit hitObstaculo;
 
-        // Trazamos una línea desde los ojos (transform.position) hasta la mano (destinoIdeal)
-        // El objeto agarrado NO estorba porque lo pusimos en "Ignore Raycast" al agarrarlo.
         if (Physics.Linecast(transform.position, destinoIdeal, out hitObstaculo))
         {
-            // ¡CHOQUE! Hay una pared o suelo entre mi cara y mi mano.
-            // Ponemos el objeto justo donde chocó el rayo.
             objetoAgarrado.transform.position = hitObstaculo.point;
-            
-            // Opcional: Acomodar la rotación para que no se vea raro
             objetoAgarrado.transform.rotation = puntoSujecion.rotation;
         }
         else
         {
-            // CAMINO LIBRE: El objeto va a la mano normalmente.
             objetoAgarrado.transform.position = destinoIdeal;
             objetoAgarrado.transform.rotation = puntoSujecion.rotation;
         }
@@ -81,20 +74,21 @@ public class AgarrarObjeto : MonoBehaviour
         if (Physics.Raycast(transform.position, transform.forward, out hit, distanciaAlcance, layerMask))
         {
             // --- NUEVA LÓGICA DE PUERTA ---
-            // Intentamos ver si lo que tocamos es una puerta
             if (hit.collider.TryGetComponent(out PuertaInteractiva puerta))
             {
-                puerta.AlternarPuerta(); // ¡La abrimos/cerramos!
-                return; // Salimos de la función para no intentar "agarrar" la puerta
+                puerta.AlternarPuerta(); 
+                return; 
             }
 
-            // --- LÓGICA DE AGARRE (La que ya tenías) ---
+            // --- LÓGICA DE AGARRE (AHORA CON TAG) ---
             rbObjeto = hit.collider.GetComponent<Rigidbody>();
-            if (rbObjeto != null && hit.collider.gameObject != miraEsfera) 
+            
+            // CONDICIÓN: Tiene que tener Rigidbody, NO ser la mira, Y tener el tag "Interactuable"
+            if (rbObjeto != null && hit.collider.gameObject != miraEsfera && hit.collider.CompareTag("Interactuable")) 
             {
                 objetoAgarrado = hit.collider.gameObject;
                 capaOriginal = objetoAgarrado.layer;
-                objetoAgarrado.layer = 2; 
+                objetoAgarrado.layer = 2; // Lo pasa a Ignore Raycast
                 rbObjeto.isKinematic = true; 
             }
         }
@@ -105,7 +99,7 @@ public class AgarrarObjeto : MonoBehaviour
         if (rbObjeto != null)
         {
             // RESTAURAMOS TODO
-            objetoAgarrado.layer = capaOriginal; // Vuelve a su capa original
+            objetoAgarrado.layer = capaOriginal; 
             rbObjeto.isKinematic = false; 
             
             // Lanzamos con fuerza
@@ -120,7 +114,6 @@ public class AgarrarObjeto : MonoBehaviour
         if (miraEsfera == null) return;
 
         RaycastHit hitScan;
-        // Excluir capa Ignore Raycast del escaneo también
         int layerMask = ~LayerMask.GetMask("Ignore Raycast");
 
         if (Physics.Raycast(transform.position, transform.forward, out hitScan, distanciaAlcance, layerMask))
@@ -128,7 +121,8 @@ public class AgarrarObjeto : MonoBehaviour
              miraEsfera.transform.position = hitScan.point + (hitScan.normal * offsetSuperficie);
              miraEsfera.transform.rotation = Quaternion.LookRotation(hitScan.normal);
 
-             if (hitScan.collider.GetComponent<Rigidbody>() != null)
+             // CONDICIÓN VISUAL: Solo se pone verde si tiene Rigidbody Y tiene el tag "Interactuable"
+             if (hitScan.collider.GetComponent<Rigidbody>() != null && hitScan.collider.CompareTag("Interactuable"))
                  PintarMira(Color.green);
              else
                  PintarMira(Color.white);

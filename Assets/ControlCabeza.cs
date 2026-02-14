@@ -33,8 +33,13 @@ public class ControlCabeza : MonoBehaviour
 
     // Variables internas
     private bool estaAgachado = false;
-    private bool haySismo = false;
+    public bool haySismo = false;
     private float alturaActualCalculada;
+
+    [Header("Detección de Techo")]
+    // (Ya no usamos distanciaRayo pública porque la calculamos matemáticamente de forma más precisa)
+    public LayerMask capasObstaculos; // Para que ignore al Player y solo vea mesas/techos
+    public bool hayAlgoArriba = false;
 
     void Start()
     {
@@ -47,6 +52,14 @@ public class ControlCabeza : MonoBehaviour
 
     void Update()
     {
+        // --- SENSOR RECALIBRADO ---
+        // El origen ahora es la altura de tu cabeza estando agachado
+        Vector3 origenSensor = transform.position + Vector3.up * alturaAgachado;
+        float radioSensor = 0.15f; // Más fino para no chocar con paredes
+        float distanciaChequeo = (alturaParado - alturaAgachado) + 0.1f; // Solo chequea la diferencia de altura
+
+        hayAlgoArriba = Physics.SphereCast(origenSensor, radioSensor, Vector3.up, out RaycastHit hit, distanciaChequeo, capasObstaculos);
+
         // 1. INPUT
         ProcesarEntrada();
 
@@ -82,15 +95,45 @@ public class ControlCabeza : MonoBehaviour
 
     void ProcesarEntrada()
     {
-        estaAgachado = false; 
-        if (Input.GetKey(teclaAgacharse)) estaAgachado = true;
+        // 1. Primero leemos qué quiere hacer el usuario (la señal de control)
+        bool quiereEstarAgachado = Input.GetKey(teclaAgacharse);
         try {
-            if (Input.GetAxis(ejeGatillo) > 0.3f) estaAgachado = true;
+            if (Input.GetAxis(ejeGatillo) > 0.3f) quiereEstarAgachado = true;
         } catch {}
+
+        // 2. Aplicamos el enclavamiento físico
+        if (estaAgachado && hayAlgoArriba) 
+        {
+            // Si YA estás agachado y hay un techo, ignoramos el joystick/teclado.
+            // Te quedás agachado por seguridad.
+            estaAgachado = true; 
+        }
+        else
+        {
+            // En cualquier otro caso (estás parado, o estás agachado pero saliste de la mesa),
+            // el personaje hace exactamente lo que mande el joystick/teclado.
+            estaAgachado = quiereEstarAgachado;
+        }
     }
 
     public void ActivarSismo(bool estado)
     {
         haySismo = estado;
+    }
+
+    // --- DEBUG VISUAL ---
+    void OnDrawGizmos()
+    {
+        // Dibujamos exactamente lo mismo que calcula el sensor para poder verlo en la pestaña Scene
+        Vector3 origenSensor = transform.position + Vector3.up * alturaAgachado;
+        float radioSensor = 0.15f;
+        float distanciaChequeo = (alturaParado - alturaAgachado) + 0.1f;
+
+        // Si detecta algo se pone ROJO, si está libre VERDE
+        Gizmos.color = hayAlgoArriba ? Color.red : Color.green; 
+        
+        // Dibuja la línea y la esfera al final
+        Gizmos.DrawLine(origenSensor, origenSensor + Vector3.up * distanciaChequeo);
+        Gizmos.DrawWireSphere(origenSensor + Vector3.up * distanciaChequeo, radioSensor);
     }
 }

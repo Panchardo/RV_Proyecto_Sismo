@@ -4,7 +4,8 @@ public class SimuladorSismo : MonoBehaviour
 {
     public float magnitudSismo = 20f; // Fuerza del empujón (Subile si no se mueven)
     private Rigidbody[] objetosAfectados; 
-
+    public bool enZonaTerremoto = false;
+    
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked; 
@@ -20,7 +21,7 @@ public class SimuladorSismo : MonoBehaviour
     void Update()
     {
         // Mantené apretada la T para el sismo
-        if (Input.GetKey(KeyCode.T))
+        if (Input.GetKey(KeyCode.T) || enZonaTerremoto)
         {
             Temblar();
         }

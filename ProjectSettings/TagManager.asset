@@ -6,11 +6,12 @@ TagManager:
   tags:
   - Interactuable
   - ZonaSegura
+  - Mesa
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Obstaculo
   - Water
   - UI
   - 
