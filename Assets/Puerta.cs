@@ -7,41 +7,55 @@ public class PuertaInteractiva : MonoBehaviour
     private bool abierta = false;
     private Quaternion rotacionCerrada;
     private Quaternion rotacionAbierta;
+
+    [Header("Interbloqueo de Seguridad")]
+    // Arrastrá acá el cubo invisible que tiene el script DetectorObstaculos
+    public DetectorObstaculos detectorPasillo; 
+
     [Header("Sonidos")]
     public AudioClip sonidoAbrir;
     public AudioClip sonidoCerrar;
+    public AudioClip sonidoBloqueado; // Un sonido de "traba" para cuando hay cajas
     public AudioSource parlante;
 
     void Start()
     {
-        // Guardamos la rotación actual como "Cerrada"
         rotacionCerrada = transform.localRotation;
-        // Calculamos la rotación "Abierta" sumando grados en Y
         rotacionAbierta = rotacionCerrada * Quaternion.Euler(0, anguloAbierta, 0);
     }
 
     void Update()
     {
-        // Lerp suaviza el movimiento para que no sea un salto brusco
         Quaternion objetivo = abierta ? rotacionAbierta : rotacionCerrada;
         transform.localRotation = Quaternion.Slerp(transform.localRotation, objetivo, Time.deltaTime * velocidad);
     }
 
-    // Esta función la llamaremos desde tu script de interacción
     public void AlternarPuerta()
     {
+        // 1. CHEQUEO DE SEGURIDAD (Protocolo Mendoza - Acto 1)
+        // Si la puerta está cerrada e intentamos abrirla, verificamos el pasillo
+        if (!abierta && detectorPasillo != null && !detectorPasillo.EstaDespejado())
+        {
+            Debug.Log("Puerta bloqueada: Hay obstáculos en la vía de evacuación.");
+            
+            // Feedback sonoro de error
+            if (parlante != null && sonidoBloqueado != null)
+            {
+                parlante.PlayOneShot(sonidoBloqueado);
+            }
+            
+            // Aquí podrías disparar un mensaje al Canvas: "Despeje el pasillo antes de continuar"
+            return; // Cortamos la ejecución: la puerta NO se abre
+        }
+
+        // 2. LÓGICA NORMAL
         abierta = !abierta;
         
-        // --- LÓGICA DE AUDIO ---
         if (parlante != null)
         {
-           
-            // Si estaba por abrir, ponemos el audio de abrir, sino el de cerrar
             AudioClip clipATocar = abierta ? sonidoAbrir : sonidoCerrar;
-            
             if (clipATocar != null)
             {
- 
                 parlante.PlayOneShot(clipATocar);
             }
         }
