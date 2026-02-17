@@ -41,6 +41,11 @@ public class MovimientoVR : MonoBehaviour
         }
 
         // 2. MOVIMIENTO HORIZONTAL (Caminar)
+        // Adentro de tu Update() de movimiento:
+    //    if (!Input.GetButton("Jump") && !Input.GetButton("Fire1")) // El mismo botón que usás de embrague
+    //    {
+            // Tu lógica normal de mover al personaje con el joystick
+        
         float moverX = Input.GetAxis("Horizontal");
         float moverZ = Input.GetAxis("Vertical");
 
@@ -61,17 +66,20 @@ public class MovimientoVR : MonoBehaviour
 
         // 3. LOGICA DE SALTO (Plano Vertical)
         // Input.GetButtonDown("Jump") suele ser la ESPACIADORA o el botón "X/A" del Joystick
+        /*
         if (Input.GetButtonDown("Jump") && estaEnElSuelo)
         {
             // Fórmula física real: V = Raíz(Altura * -2 * Gravedad)
             velocidadVertical.y = Mathf.Sqrt(alturaSalto * -2f * fuerzaGravedad);
         }
-
+*/
         // 4. APLICAR GRAVEDAD (Caída)
         // La gravedad acelera con el tiempo (Time.deltaTime)
         velocidadVertical.y += fuerzaGravedad * Time.deltaTime;
 
         // Mover el personaje (Eje Y)
         characterController.Move(velocidadVertical * Time.deltaTime);
+  //      }
     }
+        
 }

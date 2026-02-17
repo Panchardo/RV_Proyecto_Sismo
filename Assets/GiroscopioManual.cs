@@ -39,10 +39,11 @@ public class GiroscopioKickstart : MonoBehaviour
 
     void Update()
     {
-        // --- DETECCIÓN DE RE-CALIBRACIÓN (L3) ---
-        // "Recenter" debe estar configurado en el Input Manager como 'joystick button 8' (o 9/10)
-        if (Input.GetButtonDown("Recenter")|| 
-        Input.GetKeyDown(KeyCode.JoystickButton8))
+        // --- DETECCIÓN DE RE-CALIBRACIÓN (L3 o Pantalla Táctil) ---
+        // Se activa con el botón del joystick, el teclado, o si el usuario toca la pantalla del celular.
+        if (Input.GetButtonDown("Recenter") || 
+            Input.GetKeyDown(KeyCode.JoystickButton8) || 
+            (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began))
         {
             CalibrarHaciaAdelante();
             StopAllCoroutines(); // Detiene mensajes previos si los hay
@@ -139,6 +140,5 @@ public class GiroscopioKickstart : MonoBehaviour
             GUI.color = Color.cyan;
             GUILayout.Label(textoMensaje);
         }
-        // Agregá esto dentro de tu función OnGUI
     }
 }

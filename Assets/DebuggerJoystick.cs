@@ -1,14 +1,48 @@
 using UnityEngine;
 
-public class DebuggerJoystick : MonoBehaviour
+public class MapeoDeBotones : MonoBehaviour
 {
+    private string ultimoBoton = "Apretá un botón...";
+    private float tiempoVisible = 0f;
+
     void Update()
     {
-        // Esto te dirá en consola exactamente qué eje se está moviendo
-        for (int i = 0; i < 10; i++)
+        // Unity soporta hasta 20 botones genéricos por joystick
+        // Iteramos por todos para ver cuál se activó en este frame
+        for (int i = 0; i < 20; i++)
         {
-            float val = Input.GetAxis("Axis " + i); // Necesitás tener ejes llamados "Axis 0", "Axis 1", etc en el Input Manager
-            if (Mathf.Abs(val) > 0.2f) Debug.Log("Eje moviéndose: " + i + " Valor: " + val);
+            // La sintaxis interna de Unity para esto es "joystick button X"
+            if (Input.GetKeyDown("joystick button " + i))
+            {
+                ultimoBoton = "Botón: " + i;
+                tiempoVisible = 3f; // Lo mantenemos en pantalla 3 segundos
+                
+                // También lo mandamos a la consola por si estás en la PC
+                Debug.Log("Se detectó el " + ultimoBoton);
+            }
         }
+
+        // Un temporizador simple para limpiar la pantalla
+        if (tiempoVisible > 0)
+        {
+            tiempoVisible -= Time.deltaTime;
+        }
+        else
+        {
+            ultimoBoton = "Esperando input...";
+        }
+    }
+
+    void OnGUI()
+    {
+        // Hacemos la letra bien grande y verde fosforescente para que 
+        // resalte por encima de la oficina o la calle
+        GUI.color = Color.green;
+        GUI.skin.label.fontSize = 60;
+        
+        // Lo ubicamos en la parte inferior central de la pantalla
+        GUILayout.BeginArea(new Rect(Screen.width / 2 - 250, Screen.height - 150, 500, 100));
+        GUILayout.Label(ultimoBoton);
+        GUILayout.EndArea();
     }
 }
