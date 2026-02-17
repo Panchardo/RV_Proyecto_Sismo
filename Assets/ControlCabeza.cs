@@ -29,7 +29,9 @@ public class ControlCabeza : MonoBehaviour
 
     [Header("Inputs")]
     public KeyCode teclaAgacharse = KeyCode.C;
+    public KeyCode botonJoystickAgacharse = KeyCode.JoystickButton0;
     public string ejeGatillo = "Agacharse"; 
+
 
     // Variables internas
     private bool estaAgachado = false;
@@ -96,7 +98,7 @@ public class ControlCabeza : MonoBehaviour
     void ProcesarEntrada()
     {
         // 1. Primero leemos qué quiere hacer el usuario (la señal de control)
-        bool quiereEstarAgachado = Input.GetKey(teclaAgacharse);
+        bool quiereEstarAgachado = Input.GetKey(teclaAgacharse) || Input.GetKey(botonJoystickAgacharse);
         try {
             if (Input.GetAxis(ejeGatillo) > 0.3f) quiereEstarAgachado = true;
         } catch {}
