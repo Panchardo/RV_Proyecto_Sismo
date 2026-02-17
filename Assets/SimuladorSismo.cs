@@ -5,7 +5,11 @@ public class SimuladorSismo : MonoBehaviour
     public float magnitudSismo = 20f; // Fuerza del empujón (Subile si no se mueven)
     private Rigidbody[] objetosAfectados; 
     public bool enZonaTerremoto = false;
-    
+    public MochilaEmergencia mochila;
+    [Header("Apagón")]
+    // Arrastrá acá las luces principales de la oficina (Directional Light, luces de techo, etc.)
+    public GameObject[] lucesOficina;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked; 
@@ -21,7 +25,7 @@ public class SimuladorSismo : MonoBehaviour
     void Update()
     {
         // Mantené apretada la T para el sismo
-        if (Input.GetKey(KeyCode.T) || enZonaTerremoto)
+        if ((Input.GetKey(KeyCode.T) || enZonaTerremoto) && mochila.getMochilardaLista())
         {
             Temblar();
         }

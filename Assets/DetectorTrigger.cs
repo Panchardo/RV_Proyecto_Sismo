@@ -3,33 +3,45 @@ using System.Collections;
 
 public class DetectorTrigger : MonoBehaviour
 {
-    public SimuladorSismo scriptPrincipal; // Acá arrastrás el objeto con el SimuladorSismo
+    public SimuladorSismo scriptPrincipal; 
     public ControlCabeza scriptCabeza;
     private bool yaSeUso = false;
+    public Color colorLibre = new Color(0f, 1f, 0f, 0.3f);   // Verde
+    public MeshRenderer renderizadorZona; 
+
     void OnTriggerStay(Collider other)
     {
+        // 1. Verificamos que sea el jugador y que no se haya usado antes
         if (other.CompareTag("Player") && !yaSeUso)
         {
-            yaSeUso = true;
-            StartCoroutine(TemporizadorSismo());
+            // 2. Le preguntamos a la mochila si está lista
+            if (scriptPrincipal.mochila.getMochilardaLista())
+            {
+                yaSeUso = true; // Se quema este trigger para no volver a llamarse
+                ApagarEfectoVisual();
+                // ACTIVACIÓN INFINITA: Prendemos el sismo y lo dejamos así
+                scriptPrincipal.enZonaTerremoto = true;
+                if (scriptCabeza != null) scriptCabeza.haySismo = true;
+                
+                Debug.Log("¡Sismo infinito iniciado! Buscá refugio bajo el escritorio.");
+            }
         }
     }
-    IEnumerator TemporizadorSismo()
+
+    public void ActualizarColorZona()
     {
-        scriptPrincipal.enZonaTerremoto = true;
-        scriptCabeza.haySismo = true;
-        yield return new WaitForSeconds(10.0f); // Duración fija según el INPRES
-        scriptPrincipal.enZonaTerremoto = false;
-        scriptCabeza.haySismo = false;
-    }
-/*
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Player"))
+        if (renderizadorZona != null)
         {
-            scriptPrincipal.enZonaTerremoto = false;
-            scriptCabeza.haySismo = false;
+            // Cambiamos el color del material dinámicamente
+            renderizadorZona.material.color = colorLibre;
         }
     }
-*/
+
+    private void ApagarEfectoVisual()
+    {
+        if (renderizadorZona != null)
+        {
+            renderizadorZona.enabled = false; // Oculta el cubo por completo
+        }
+    }
 }

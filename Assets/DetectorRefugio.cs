@@ -1,16 +1,26 @@
 using UnityEngine;
+using System.Collections;
 
 public class DetectorRefugio : MonoBehaviour
 {
-    public bool estasA_Salvo = false; // Mirá esta casilla en el Inspector al probar
-
+    public SimuladorSismo scriptPrincipal;
+    public ControlCabeza scriptCabeza;
+    public bool yaSeRefugio = false; // Mirá esta casilla en el Inspector al probar
+    public MochilaEmergencia mochila;
     void OnTriggerEnter(Collider other)
     {
+        if (mochila.getMochilardaLista()){
         // Si lo que tocamos tiene la etiqueta correcta...
-        if (other.CompareTag("ZonaSegura"))
-        {
-            estasA_Salvo = true;
-            Debug.Log("✅ ¡ESTAS A SALVO!");
+            if (other.CompareTag("ZonaSegura"))
+            {
+                yaSeRefugio = true;
+                if (scriptPrincipal.enZonaTerremoto)
+                {
+                  StartCoroutine(SecuenciaRefugio());  
+                }
+                
+                Debug.Log("✅ ¡ESTAS A SALVO!");
+            }
         }
     }
 
@@ -19,8 +29,38 @@ public class DetectorRefugio : MonoBehaviour
         // Si salimos de la etiqueta correcta...
         if (other.CompareTag("ZonaSegura"))
         {
-            estasA_Salvo = false;
+            yaSeRefugio = false;
             Debug.Log("⚠️ SALISTE DEL REFUGIO");
         }
     }
+
+    IEnumerator SecuenciaRefugio()
+    {
+        Debug.Log("Te refugiaste. El sismo durará 5 segundos más...");
+        
+        // 1. Cuenta regresiva final
+        yield return new WaitForSeconds(5.0f);
+        
+        // 2. Apagamos el movimiento físico y la vibración de la cámara
+        scriptPrincipal.enZonaTerremoto = false;
+        if (scriptCabeza != null) scriptCabeza.haySismo = false;
+        
+        Debug.Log("Sismo terminado. Iniciando apagón preventivo.");
+
+        // 3. Cortamos la energía usando el array de tu SimuladorSismo
+        foreach (GameObject luz in scriptPrincipal.lucesOficina)
+        {
+            if (luz != null) luz.SetActive(false);
+        }
+        scriptPrincipal.mochila.ActivarRescate();
+        // --- NUEVO: EL APAGÓN TOTAL DE UNITY ---
+        // Matamos la intensidad de la luz del cielo
+        RenderSettings.ambientIntensity = 0f;
+        // Apagamos los reflejos del entorno en los materiales
+        RenderSettings.reflectionIntensity = 0f;
+        Debug.Log("LOOOL");
+        // Por si acaso, forzamos el color ambiental a negro puro
+       // RenderSettings.ambientLight = Color.black;
+    }
+
 }

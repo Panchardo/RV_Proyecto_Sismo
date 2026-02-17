@@ -79,6 +79,18 @@ public class AgarrarObjeto : MonoBehaviour
                 puerta.AlternarPuerta(); 
                 return; 
             }
+            
+            // --- LÓGICA DE KIT DE EMERGENCIA ---
+            if (hit.collider.TryGetComponent(out ItemEmergencia item))
+            {
+                item.Recolectar();
+                return; 
+            }
+            if (hit.collider.TryGetComponent(out MochilaEmergencia mochila))
+            {
+                mochila.InteractuarMochila();
+                return; 
+            }
 
             // --- LÓGICA DE AGARRE (AHORA CON TAG) ---
             rbObjeto = hit.collider.GetComponent<Rigidbody>();
