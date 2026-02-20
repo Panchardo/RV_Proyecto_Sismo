@@ -92,6 +92,12 @@ public class AgarrarObjeto : MonoBehaviour
                 return; 
             }
 
+            if (hit.collider.TryGetComponent(out ValvulaInteractiva valvula))
+            {
+                valvula.CerrarValvula(); 
+                return; 
+            }
+
             // --- LÓGICA DE AGARRE (AHORA CON TAG) ---
             rbObjeto = hit.collider.GetComponent<Rigidbody>();
             

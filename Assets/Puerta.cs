@@ -11,12 +11,15 @@ public class PuertaInteractiva : MonoBehaviour
     [Header("Interbloqueo Fase 1 (Cajas)")]
     public DetectorObstaculos detectorPasillo; 
 
-    [Header("Interbloqueo Fase 3 (Evacuación)")]
+    [Header("Interbloqueo Fase 3 y 4 (Evacuación)")]
     public bool esPuertaDeSalida = false; 
     public GameObject linternaDelJugador; 
+    
+    // --- AHORA ES UN ARRAY (LISTA) DE VÁLVULAS ---
+    public ValvulaInteractiva[] valvulasDeEmergencia; 
 
     [Header("Iluminación Exterior (Solo Salida)")]
-    public GameObject solDirectionalLight; // Arrastrá tu "Directional Light" acá
+    public GameObject solDirectionalLight; 
 
     [Header("Sonidos")]
     public AudioClip sonidoAbrir;
@@ -38,51 +41,50 @@ public class PuertaInteractiva : MonoBehaviour
 
     public void AlternarPuerta()
     {
-        // 1. CHEQUEO DE SEGURIDAD FASE 1: Cajas en el pasillo
+        // 1. CHEQUEO: Cajas
         if (!abierta && detectorPasillo != null && !detectorPasillo.EstaDespejado())
         {
-            Debug.Log("Puerta bloqueada: Hay obstáculos en la vía de evacuación.");
+            Debug.Log("Bloqueada: Obstáculos en la vía.");
             if (parlante != null && sonidoBloqueado != null) parlante.PlayOneShot(sonidoBloqueado);
             return; 
         }
 
-        // 2. CHEQUEO DE SEGURIDAD FASE 3: Puerta a la calle sin linterna
+        // 2. CHEQUEO: Linterna y Válvulas (Solo si es puerta de salida)
         if (!abierta && esPuertaDeSalida)
         {
             if (linternaDelJugador == null || !linternaDelJugador.activeInHierarchy)
             {
-                Debug.Log("Puerta bloqueada: ¡No podés evacuar a oscuras sin tu linterna!");
+                Debug.Log("Bloqueada: ¡Necesitás la linterna!");
                 if (parlante != null && sonidoBloqueado != null) parlante.PlayOneShot(sonidoBloqueado);
                 return; 
             }
+
+            // --- REVISAMOS TODAS LAS VÁLVULAS DE LA LISTA ---
+            foreach (ValvulaInteractiva valvula in valvulasDeEmergencia)
+            {
+                if (valvula != null && !valvula.estaCerrada)
+                {
+                    Debug.Log("Bloqueada: ¡Falta cerrar suministros (Gas/Agua)!");
+                    if (parlante != null && sonidoBloqueado != null) parlante.PlayOneShot(sonidoBloqueado);
+                    return; // Si encuentra UNA sola abierta, corta todo y no abre la puerta
+                }
+            }
         }
 
-        // 3. LÓGICA NORMAL DE APERTURA
+        // 3. APERTURA NORMAL
         abierta = !abierta;
         
-        // Apagamos la zona verde (Fase 1)
-        if (abierta && detectorPasillo != null)
-        {
-            detectorPasillo.ApagarEfectoVisual();
-        }
+        if (abierta && detectorPasillo != null) detectorPasillo.ApagarEfectoVisual();
 
-        // --- NUEVO: RESTAURAR LUZ AL ABRIR LA SALIDA ---
+        // 4. RESTAURAR LUZ AL SALIR
         if (abierta && esPuertaDeSalida)
         {
-            Debug.Log("Abriendo salida. Restaurando iluminación global.");
-
-            // Restauramos la luz ambiental y el color base de Unity
             RenderSettings.ambientIntensity = 1f; 
             RenderSettings.reflectionIntensity = 1f;
             RenderSettings.ambientLight = new Color(0.5f, 0.5f, 0.5f); 
 
-            // Prendemos el sol principal
-            if (solDirectionalLight != null)
-            {
-                solDirectionalLight.SetActive(true);
-            }
+            if (solDirectionalLight != null) solDirectionalLight.SetActive(true);
 
-            // Apagamos la linterna de tu mano automáticamente para que no quede prendida de día
             if (linternaDelJugador != null)
             {
                 Light luzLinterna = linternaDelJugador.GetComponentInChildren<Light>();
@@ -90,7 +92,6 @@ public class PuertaInteractiva : MonoBehaviour
             }
         }
 
-        // 4. SONIDO
         if (parlante != null)
         {
             AudioClip clipATocar = abierta ? sonidoAbrir : sonidoCerrar;

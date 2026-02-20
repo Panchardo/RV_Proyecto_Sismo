@@ -3,6 +3,7 @@ using System.Collections;
 
 public class DetectorRefugio : MonoBehaviour
 {
+    public ValvulaInteractiva[] valvulasDeEmergencia;
     public SimuladorSismo scriptPrincipal;
     public ControlCabeza scriptCabeza;
     public bool yaSeRefugio = false; // Mirá esta casilla en el Inspector al probar
@@ -61,6 +62,15 @@ public class DetectorRefugio : MonoBehaviour
         Debug.Log("LOOOL");
         // Por si acaso, forzamos el color ambiental a negro puro
        // RenderSettings.ambientLight = Color.black;
+       // --- NUEVO: ACTIVAR LA VÁLVULA ---
+// --- PRENDER TODAS LAS VÁLVULAS ---
+        foreach (ValvulaInteractiva valvula in valvulasDeEmergencia)
+        {
+            if (valvula != null)
+            {
+                valvula.IniciarAlertaEmergencia();
+            }
+        }
     }
 
 }
