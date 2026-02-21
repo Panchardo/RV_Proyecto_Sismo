@@ -10,7 +10,8 @@ public class AgarrarObjeto : MonoBehaviour
     [Header("Referencia Visual")]
     public GameObject miraEsfera;
     private Renderer miraRenderer;
-    private float offsetSuperficie = 0.05f; 
+    private float offsetSuperficie = 0.2f; 
+    public TMPro.TextMeshProUGUI textoTooltip;
 
     // Variables internas
     private GameObject objetoAgarrado;
@@ -97,6 +98,12 @@ public class AgarrarObjeto : MonoBehaviour
                 valvula.CerrarValvula(); 
                 return; 
             }
+            // --- NUEVO: LÓGICA DE PANTALLA TÁCTIL ---
+            if (hit.collider.TryGetComponent(out PanelDialogo pantalla))
+            {
+                pantalla.AvanzarDialogo(); 
+                return; 
+            }
 
             // --- LÓGICA DE AGARRE (AHORA CON TAG) ---
             rbObjeto = hit.collider.GetComponent<Rigidbody>();
@@ -145,16 +152,35 @@ public class AgarrarObjeto : MonoBehaviour
              miraEsfera.transform.position = hitScan.point + (hitScan.normal * offsetSuperficie);
              miraEsfera.transform.rotation = Quaternion.LookRotation(hitScan.normal);
 
-             // CONDICIÓN VISUAL: Solo se pone verde si tiene Rigidbody Y tiene el tag "Interactuable"
-             if (hitScan.collider.GetComponent<Rigidbody>() != null && hitScan.collider.CompareTag("Interactuable"))
+             // --- NUEVO: HACER QUE EL TEXTO MIRE SIEMPRE AL JUGADOR ---
+             if (textoTooltip != null)
+             {
+                 // Obligamos al texto a mirar hacia la cámara para que nunca quede al revés
+                 textoTooltip.transform.rotation = Quaternion.LookRotation(textoTooltip.transform.position - transform.position);
+             }
+
+             // CONDICIÓN VISUAL Y DE TEXTO
+             if (hitScan.collider.CompareTag("Interactuable"))
+             {
                  PintarMira(Color.green);
+
+                 // Si tiene el script de etiqueta, mostramos el nombre
+                 if (textoTooltip != null && hitScan.collider.TryGetComponent(out EtiquetaObjeto etiqueta))
+                 {
+                     textoTooltip.text = etiqueta.nombreVisible;
+                 }
+             }
              else
+             {
                  PintarMira(Color.white);
+                 if (textoTooltip != null) textoTooltip.text = ""; // Borramos el texto si miramos a la pared
+             }
         }
         else
         {
              ResetearPosicionMira();
              PintarMira(Color.white);
+             if (textoTooltip != null) textoTooltip.text = ""; // Borramos el texto si miramos a la nada
         }
     }
     

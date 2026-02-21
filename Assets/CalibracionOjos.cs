@@ -3,7 +3,6 @@ using UnityEngine;
 public class CalibradorVR : MonoBehaviour
 {
     [Header("Componentes de Cámara VR")]
-    // ATENCIÓN: Ahora son tipo 'Camera', no 'Transform'
     public Camera ojoIzquierdo;
     public Camera ojoDerecho;
 
@@ -12,17 +11,23 @@ public class CalibradorVR : MonoBehaviour
     public float ipdMinimo = 0.050f;
     public float ipdMaximo = 0.080f;
     public float velocidadIPD = 0.02f; 
-    public string botonIPD = "Jump"; // El botón que ya usabas
 
     [Header("Configuración FOV (Eje Vertical)")]
     public float fovActual = 80f;
     public float fovMinimo = 60f;
     public float fovMaximo = 110f;
-    public float velocidadFOV = 15f; // Grados por segundo
-    public string botonFOV = "Fire1"; // Acá poné el nombre de tu botón Cuadrado (Agarre)
+    public float velocidadFOV = 15f;
 
-    private bool ajustandoIPD = false;
-    private bool ajustandoFOV = false;
+    [Header("Controles y Sensibilidad")]
+    public string botonInteractuar = "Fire1"; 
+    public float tiempoParaActivar = 2.0f;    
+    
+    // --- NUEVA VARIABLE PARA LA ZONA MUERTA ---
+    [Range(0.1f, 0.9f)]
+    public float zonaMuertaAnalogico = 0.4f; 
+
+    private float tiempoApretado = 0f;
+    public bool enModoCalibracion = false; 
 
     void Start()
     {
@@ -32,30 +37,41 @@ public class CalibradorVR : MonoBehaviour
 
     void Update()
     {
-        // Leemos el estado de los "embragues" lógicos
-        ajustandoIPD = Input.GetButton(botonIPD);
-        ajustandoFOV = Input.GetButton(botonFOV);
+        // 1. LÓGICA DEL TEMPORIZADOR
+        if (Input.GetButton(botonInteractuar))
+        {
+            tiempoApretado += Time.deltaTime; 
+            if (tiempoApretado >= tiempoParaActivar)
+            {
+                enModoCalibracion = true;
+            }
+        }
+        else
+        {
+            tiempoApretado = 0f;
+            enModoCalibracion = false;
+        }
 
-        // --- LÓGICA DE IPD (Izquierda / Derecha) ---
-        if (ajustandoIPD)
+        // 2. LÓGICA DE CALIBRACIÓN CON ZONA MUERTA INTELIGENTE
+        if (enModoCalibracion)
         {
             float inputX = Input.GetAxis("Horizontal"); 
-            if (Mathf.Abs(inputX) > 0.05f)
+            float inputY = Input.GetAxis("Vertical"); 
+
+            // Calculamos la fuerza absoluta de cada movimiento (sin importar si es negativo o positivo)
+            float fuerzaX = Mathf.Abs(inputX);
+            float fuerzaY = Mathf.Abs(inputY);
+
+            // GANA EL EJE X (IPD): Si pasaste la zona muerta Y el movimiento horizontal es mayor al vertical
+            if (fuerzaX > zonaMuertaAnalogico && fuerzaX > fuerzaY)
             {
                 ipdActual += inputX * velocidadIPD * Time.deltaTime;
                 ipdActual = Mathf.Clamp(ipdActual, ipdMinimo, ipdMaximo);
                 AplicarIPD();
             }
-        }
-
-        // --- LÓGICA DE FOV (Arriba / Abajo) ---
-        if (ajustandoFOV)
-        {
-            // Usamos el eje vertical del joystick para "acercar/alejar" el FOV
-            float inputY = Input.GetAxis("Vertical"); 
-            if (Mathf.Abs(inputY) > 0.05f)
+            // GANA EL EJE Y (FOV): Si pasaste la zona muerta Y el movimiento vertical es mayor al horizontal
+            else if (fuerzaY > zonaMuertaAnalogico && fuerzaY > fuerzaX)
             {
-                // Sumamos los grados. Arriba aumenta el FOV (aleja), Abajo lo achica (acerca).
                 fovActual += inputY * velocidadFOV * Time.deltaTime;
                 fovActual = Mathf.Clamp(fovActual, fovMinimo, fovMaximo);
                 AplicarFOV();
@@ -67,7 +83,6 @@ public class CalibradorVR : MonoBehaviour
     {
         if (ojoIzquierdo != null && ojoDerecho != null)
         {
-            // Modificamos el Transform asociado a la cámara
             ojoIzquierdo.transform.localPosition = new Vector3(-ipdActual / 2f, 0f, 0f);
             ojoDerecho.transform.localPosition = new Vector3(ipdActual / 2f, 0f, 0f);
         }
@@ -77,7 +92,6 @@ public class CalibradorVR : MonoBehaviour
     {
         if (ojoIzquierdo != null && ojoDerecho != null)
         {
-            // Modificamos la óptica virtual
             ojoIzquierdo.fieldOfView = fovActual;
             ojoDerecho.fieldOfView = fovActual;
         }
@@ -85,27 +99,35 @@ public class CalibradorVR : MonoBehaviour
 
     void OnGUI()
     {
-        // Solo mostramos la UI si estamos apretando alguno de los dos botones
-        if (ajustandoIPD || ajustandoFOV)
+        if (enModoCalibracion)
         {
             GUIStyle estilo = new GUIStyle(GUI.skin.label);
-            estilo.fontSize = 45;
+            estilo.fontSize = 40;
             estilo.normal.textColor = Color.yellow;
             estilo.alignment = TextAnchor.MiddleCenter;
             
-            string textoMostrar = "";
-            
-            // Definimos qué texto mostrar según qué botón estés apretando
-            if (ajustandoIPD) textoMostrar = "Ajuste IPD:\n" + (ipdActual * 1000f).ToString("F0") + " mm";
-            if (ajustandoFOV) textoMostrar = "Ajuste FOV:\n" + fovActual.ToString("F1") + "°";
+            string textoMostrar = "MODO CALIBRACIÓN\n" + 
+                                  "IPD: " + (ipdActual * 1000f).ToString("F0") + " mm\n" + 
+                                  "FOV: " + fovActual.ToString("F1") + "°";
 
-            // Ojo Izquierdo
-            Rect rectIzquierdo = new Rect(0, 100, Screen.width / 2, 150);
+            Rect rectIzquierdo = new Rect(0, Screen.height / 2 - 100, Screen.width / 2, 200);
             GUI.Label(rectIzquierdo, textoMostrar, estilo);
 
-            // Ojo Derecho
-            Rect rectDerecho = new Rect(Screen.width / 2, 100, Screen.width / 2, 150);
+            Rect rectDerecho = new Rect(Screen.width / 2, Screen.height / 2 - 100, Screen.width / 2, 200);
             GUI.Label(rectDerecho, textoMostrar, estilo);
+        }
+        else if (tiempoApretado > 0.5f) 
+        {
+            GUIStyle estiloCarga = new GUIStyle(GUI.skin.label);
+            estiloCarga.fontSize = 25;
+            estiloCarga.normal.textColor = Color.white;
+            estiloCarga.alignment = TextAnchor.LowerCenter;
+            
+            Rect rectCargaIzq = new Rect(0, Screen.height - 100, Screen.width / 2, 50);
+            Rect rectCargaDer = new Rect(Screen.width / 2, Screen.height - 100, Screen.width / 2, 50);
+            
+            GUI.Label(rectCargaIzq, "Mantén para calibrar...", estiloCarga);
+            GUI.Label(rectCargaDer, "Mantén para calibrar...", estiloCarga);
         }
     }
 }

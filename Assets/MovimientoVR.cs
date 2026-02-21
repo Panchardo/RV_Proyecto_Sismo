@@ -10,6 +10,9 @@ public class MovimientoVR : MonoBehaviour
     [Header("Física de Salto")]
     public float fuerzaGravedad = -9.81f;
     public float alturaSalto = 1.2f; // Altura en metros (saltás 1 metro y pico)
+
+    [Header("Referencia al Calibrador")]
+    public CalibradorVR miCalibrador;
     
     // Variables internas del motor físico
     private CharacterController characterController;
@@ -28,6 +31,10 @@ public class MovimientoVR : MonoBehaviour
         if (camaraTransform == null) {
             if (Camera.main != null) camaraTransform = Camera.main.transform;
             else return;
+        }
+        if (miCalibrador != null && miCalibrador.enModoCalibracion)
+        {
+            return; // El "return" hace que el código no siga leyendo hacia abajo. ¡Te congela!
         }
 
         // 1. CHEQUEO DE PISO (¿Estamos tocando el suelo?)

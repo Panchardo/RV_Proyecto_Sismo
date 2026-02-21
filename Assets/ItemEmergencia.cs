@@ -30,7 +30,7 @@ public class ItemEmergencia : MonoBehaviour
     {
         // Efecto "Respiración LED"
         float pulso = Mathf.PingPong(Time.time * 1.5f, 0.5f);
-        Color colorBrillo = Color.yellow * pulso;
+        Color colorBrillo = Color.red * pulso;
 
         // Le mandamos el pulso de luz a todos los materiales al mismo tiempo
         foreach (Material mat in materiales)

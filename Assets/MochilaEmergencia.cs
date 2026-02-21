@@ -4,9 +4,9 @@ using UnityEngine;
 public class MochilaEmergencia : MonoBehaviour
 {
     private int itemsRecolectados = 0;
-    private int totalItems = 3; // Linterna, Radio, Botiquín
+    private int totalItems = 5; // Linterna, Radio, Botiquín
     public bool mochilaLista = false;
-
+    public PanelDialogo monitorOficina;
     private Material mat;
     private bool activarResaltado = false;
 
@@ -51,6 +51,7 @@ public class MochilaEmergencia : MonoBehaviour
         // FASE 1: Guardar las cosas antes del sismo
         if (itemsRecolectados >= totalItems && !mochilaLista && !enModoRescate)
         {
+            monitorOficina.EstablecerPaso(1);
             mochilaLista = true;
             activarResaltado = false;
             mat.SetColor("_EmissionColor", Color.black); 

@@ -8,6 +8,7 @@ public class DetectorRefugio : MonoBehaviour
     public ControlCabeza scriptCabeza;
     public bool yaSeRefugio = false; // Mirá esta casilla en el Inspector al probar
     public MochilaEmergencia mochila;
+    public PanelDialogo monitorOficina;
     void OnTriggerEnter(Collider other)
     {
         if (mochila.getMochilardaLista()){
@@ -44,9 +45,11 @@ public class DetectorRefugio : MonoBehaviour
         
         // 2. Apagamos el movimiento físico y la vibración de la cámara
         scriptPrincipal.enZonaTerremoto = false;
+        scriptPrincipal.FrenarSonido(); // (O simplemente FrenarSonido(); si estás adentro del mismo script)
         if (scriptCabeza != null) scriptCabeza.haySismo = false;
         
         Debug.Log("Sismo terminado. Iniciando apagón preventivo.");
+        monitorOficina.EstablecerPaso(3);
 
         // 3. Cortamos la energía usando el array de tu SimuladorSismo
         foreach (GameObject luz in scriptPrincipal.lucesOficina)

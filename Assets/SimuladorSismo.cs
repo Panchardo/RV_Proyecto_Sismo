@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class SimuladorSismo : MonoBehaviour
 {
+    [Header("Audio del Terremoto")]
+    public AudioSource parlanteTerremoto;
+
+    [Header("Fuerza del sismo")]
     public float magnitudSismo = 20f; // Fuerza del empujón (Subile si no se mueven)
     private Rigidbody[] objetosAfectados; 
     public bool enZonaTerremoto = false;
@@ -51,6 +55,22 @@ public class SimuladorSismo : MonoBehaviour
              // ForceMode.Force es continuo (como viento o empuje constante)
              // ForceMode.Impulse es golpes (como martillazos). Probá ambos.
              rb.AddForce(fuerzaFinal, ForceMode.Impulse);
+        }
+    }
+    public void IniciarSonido()
+    {
+        // Chequeamos que exista el parlante y que no esté sonando ya
+        if (parlanteTerremoto != null && !parlanteTerremoto.isPlaying)
+        {
+            parlanteTerremoto.Play();
+        }
+    }
+
+    public void FrenarSonido()
+    {
+        if (parlanteTerremoto != null)
+        {
+            parlanteTerremoto.Stop(); // La función Stop() corta el audio instantáneamente
         }
     }
 }
