@@ -7,6 +7,7 @@ public class UltimaZona : MonoBehaviour
     public AudioClip sonidoVictoria; // Un sonido de misión cumplida, aplausos, o radio de rescate
     public Color colorLibre = new Color(0f, 1f, 0f, 0.3f); 
     public MeshRenderer renderizadorZona; 
+    public GameDirector gestor;
 
     private bool simulacionTerminada = false;
 
@@ -15,7 +16,6 @@ public class UltimaZona : MonoBehaviour
         ActualizarColorZona();
     }
 
-    // Esta función se dispara automáticamente cuando alguien entra en la zona
     private void OnTriggerEnter(Collider otro)
     {
         // Verificamos que el que entró sea el Jugador (y no una caja o puerta)
@@ -24,6 +24,10 @@ public class UltimaZona : MonoBehaviour
             simulacionTerminada = true;
             CompletarSimulacion();
             ApagarEfectoVisual();
+            if (gestor != null)
+            {
+                gestor.TerminarSimulacion();
+            }
         }
     }
     public void ActualizarColorZona()

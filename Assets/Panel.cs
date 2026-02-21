@@ -13,6 +13,7 @@ public class PanelDialogo : MonoBehaviour
     [Header("Sonido")]
     public AudioSource parlante;
     public AudioClip sonidoBip; // Un ruidito de computadora o tecla al pasar de página
+    public bool esTocable = true;
 
     private int indiceActual = 0;
 
@@ -28,6 +29,7 @@ public class PanelDialogo : MonoBehaviour
     // ESTA FUNCIÓN LA VA A LLAMAR TU JUGADOR AL "HACER CLIC" CON EL RAYO
     public void AvanzarDialogo()
     {
+        if (!esTocable) return;
         if (dialogos.Length == 0) return;
 
         indiceActual++;
