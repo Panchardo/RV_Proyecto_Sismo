@@ -53,8 +53,8 @@ public class MovimientoVR : MonoBehaviour
     //    {
             // Tu lógica normal de mover al personaje con el joystick
         
-        float moverX = Input.GetAxis("Horizontal");
-        float moverZ = Input.GetAxis("Vertical");
+        float moverZ = Input.GetAxis("Horizontal");
+        float moverX = Input.GetAxis("Vertical");
 
         Vector3 frente = camaraTransform.forward;
         Vector3 derecha = camaraTransform.right;

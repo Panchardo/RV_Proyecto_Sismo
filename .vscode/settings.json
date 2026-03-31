@@ -56,5 +56,5 @@
         "temp/": true,
         "Temp/": true
     },
-    "dotnet.defaultSolution": "SismoVR.sln"
+    "dotnet.defaultSolution": "RV_Proyecto_Sismo.sln"
 }

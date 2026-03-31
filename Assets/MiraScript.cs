@@ -1,11 +1,16 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MiraInteractiva : MonoBehaviour
 {
-    [Header("Configuración")]
-    public float distanciaMaxima = 3f; // Distancia por defecto
+    [Header("Configuración Física")]
+    public float distanciaMaxima = 20f; 
     public GameObject miraObjeto; 
-    
+    public LayerMask capasAignorar; 
+
+    [Header("Interfaz (HUD)")]
+    public Text textoDebug; // El componente Text de tu Canvas
+
     [Header("Colores")]
     public Color colorReposo = Color.blue;
     public Color colorActivo = Color.green;
@@ -14,55 +19,66 @@ public class MiraInteractiva : MonoBehaviour
 
     void Start()
     {
+        // Configuramos la mira visual
         if (miraObjeto != null)
+        {
             miraRenderer = miraObjeto.GetComponent<Renderer>();
+            // Evitamos que la mira se detecte a sí misma
+            if (miraObjeto.GetComponent<Collider>())
+                miraObjeto.GetComponent<Collider>().enabled = false;
+        }
+
+        // Limpiamos cualquier texto previo al arrancar
+        if (textoDebug != null) textoDebug.text = "Buscando colisiones...";
     }
 
-    // USAMOS LATEUPDATE: Esto arregla que la mira "baile" o se descentre.
-    // Se ejecuta DESPUÉS de que la cámara y el joystick terminaron de moverse.
     void LateUpdate()
     {
-        if (miraObjeto == null) return;
+        if (miraObjeto == null || textoDebug == null) return;
 
         RaycastHit hit;
-        // Lanzamos rayo desde la posición de la Cabeza hacia adelante
-        bool detectado = Physics.Raycast(transform.position, transform.forward, out hit, distanciaMaxima);
+        // El "~" invierte la máscara para que ignore SOLO lo que selecciones
+        bool detectado = Physics.Raycast(transform.position, transform.forward, out hit, distanciaMaxima, ~capasAignorar);
+        
+        // Debug visual para la PC
+        Debug.DrawRay(transform.position, transform.forward * distanciaMaxima, Color.red);
 
         if (detectado)
         {
-            // 1. POSICIONAMIENTO INTELIGENTE
-            // Ponemos la mira en el punto de impacto...
-            // PERO la traemos un poquito hacia nosotros (- transform.forward * 0.05f)
-            // para que no quede "enterrada" en la textura de la pared.
-            miraObjeto.transform.position = hit.point - (transform.forward * 0.05f);
+            // 1. ACTUALIZAR HUD CON INFO TÉCNICA
+            // Aquí es donde verás si el botón tiene el Collider y el Tag correctos
+            textoDebug.text = $"<b>OBJETO:</b> {hit.collider.name}\n" +
+                              $"<b>TAG:</b> {hit.collider.tag}\n" +
+                              $"<b>LAYER:</b> {LayerMask.LayerToName(hit.collider.gameObject.layer)}";
 
-            // 2. ROTACIÓN (Opcional pero queda Pro)
-            // Hacemos que la "chapa" de la mira se acomode al ángulo de la pared
+            // 2. POSICIONAR MIRA
+            miraObjeto.transform.position = hit.point - (transform.forward * 0.1f);
             miraObjeto.transform.rotation = Quaternion.LookRotation(hit.normal);
 
-            // 3. LOGICA DE COLOR
+            // 3. LÓGICA DE INTERACCIÓN
             if (hit.collider.CompareTag("Interactuable"))
             {
                 PintarMira(colorActivo);
-                if (Input.GetButtonDown("Fire1") || Input.touchCount > 0) // Soporte para toque en pantalla también
+                // Fire1 suele ser el botón principal del joystick o el toque en pantalla
+                if (Input.GetButtonDown("Fire1") || Input.GetMouseButtonDown(0))
                 {
-                   // Lógica de disparo/acción
+                    Button btn = hit.collider.GetComponent<Button>();
+                    if (btn != null) btn.onClick.Invoke();
                 }
             }
-            else
-            {
-                PintarMira(colorReposo);
+            else 
+            { 
+                PintarMira(colorReposo); 
             }
         }
         else
         {
-            // SI NO TOCA NADA:
-            // La ponemos flotando a la distancia máxima
+            // Si el rayo no toca nada, lo indicamos para saber que el script está vivo
+            textoDebug.text = "<color=red>MIRA: Sin colisión</color>";
+            
+            // Mira en posición de reposo
             miraObjeto.transform.position = transform.position + (transform.forward * distanciaMaxima);
-            
-            // La rotamos para que mire al jugador
             miraObjeto.transform.LookAt(transform.position);
-            
             PintarMira(colorReposo);
         }
     }

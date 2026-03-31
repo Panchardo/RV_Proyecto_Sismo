@@ -5,11 +5,14 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/Pancho_test.unity
-    guid: cbdf89a58ef351f4eb2ed5bbe8b6d018
+  - enabled: 1
+    path: Assets/Scenes/MenuPrincipal.unity
+    guid: cc7e4baf72280714d8e97d8d727019e9
   - enabled: 1
     path: Assets/Scenes/oficina.unity
     guid: b101081a697899e4293b52cc09cfbbf5
+  - enabled: 0
+    path: Assets/Scenes/Pancho_test.unity
+    guid: cbdf89a58ef351f4eb2ed5bbe8b6d018
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 57f9f078b093d034caafc8f48dff1828, type: 2}

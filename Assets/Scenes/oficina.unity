@@ -12038,6 +12038,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 90
       objectReference: {fileID: 0}
+    - target: {fileID: 4956203656019559688, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5129028348955210555, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       propertyPath: m_TagString
       value: Untagged
@@ -12194,6 +12198,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7764922288216431421, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7876148686976518522, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       propertyPath: m_Name
       value: OficinaCompleta
@@ -12208,6 +12216,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7972153053911236807, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       propertyPath: m_Convex
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8168715702941322886, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8197899936042627118, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
