@@ -13049,6 +13049,10 @@ PrefabInstance:
       propertyPath: magnitudSismo
       value: 0.06
       objectReference: {fileID: 0}
+    - target: {fileID: 8821580180423247904, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      propertyPath: botonJoystickAgacharse
+      value: 335
+      objectReference: {fileID: 0}
     - target: {fileID: 8850060463727109510, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       propertyPath: m_Enabled
       value: 1

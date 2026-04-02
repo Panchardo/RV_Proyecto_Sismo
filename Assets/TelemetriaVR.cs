@@ -44,7 +44,7 @@ public class TelemetriaVR : MonoBehaviour
             reporte = "MIRA: Al aire";
         }
     }
-
+/*
     void OnGUI()
     {
         GUI.backgroundColor = Color.black;
@@ -54,4 +54,5 @@ public class TelemetriaVR : MonoBehaviour
         estilo.normal.textColor = Color.white;
         GUI.Label(new Rect(25, 40, 400, 100), $"{reporte}\nINPUT: {ultimoBoton}", estilo);
     }
+*/
 }
