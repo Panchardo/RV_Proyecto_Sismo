@@ -15,9 +15,6 @@ public class PuertaInteractiva : MonoBehaviour
     public bool esPuertaDeSalida = false; 
     public GameObject linternaDelJugador; 
     
-    // --- AHORA ES UN ARRAY (LISTA) DE VÁLVULAS ---
-    public ValvulaInteractiva[] valvulasDeEmergencia; 
-
     [Header("Iluminación Exterior (Solo Salida)")]
     public GameObject solDirectionalLight; 
 
@@ -49,7 +46,7 @@ public class PuertaInteractiva : MonoBehaviour
             return; 
         }
 
-        // 2. CHEQUEO: Linterna y Válvulas (Solo si es puerta de salida)
+        // 2. CHEQUEO: Linterna (Solo si es puerta de salida)
         if (!abierta && esPuertaDeSalida)
         {
             if (linternaDelJugador == null || !linternaDelJugador.activeInHierarchy)
@@ -58,23 +55,15 @@ public class PuertaInteractiva : MonoBehaviour
                 if (parlante != null && sonidoBloqueado != null) parlante.PlayOneShot(sonidoBloqueado);
                 return; 
             }
-
-            // --- REVISAMOS TODAS LAS VÁLVULAS DE LA LISTA ---
-            foreach (ValvulaInteractiva valvula in valvulasDeEmergencia)
-            {
-                if (valvula != null && !valvula.estaCerrada)
-                {
-                    Debug.Log("Bloqueada: ¡Falta cerrar suministros (Gas/Agua)!");
-                    if (parlante != null && sonidoBloqueado != null) parlante.PlayOneShot(sonidoBloqueado);
-                    return; // Si encuentra UNA sola abierta, corta todo y no abre la puerta
-                }
-            }
         }
 
-        // 3. APERTURA NORMAL
+        // 3. APERTURA NORMAL (Las válvulas ya no importan acá)
         abierta = !abierta;
         
-        if (abierta && detectorPasillo != null) detectorPasillo.ApagarEfectoVisual();
+        if (abierta && detectorPasillo != null) {
+            detectorPasillo.ApagarEfectoVisual();
+            FindObjectOfType<GestorObjetivos>().MarcarObjetivo("Despejar");
+        }
 
         // 4. RESTAURAR LUZ AL SALIR
         if (abierta && esPuertaDeSalida)

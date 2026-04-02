@@ -1,76 +1,121 @@
 using UnityEngine;
+using System.Collections;
+
 
 public class SimuladorSismo : MonoBehaviour
 {
+
+    [Header("Configuración Réplica")]
+    public float magnitudReplicaFisica = 8f; 
+    public float magnitudReplicaCamara = 0.05f; // Más suave que el 0.1f original
+    [Header("Referencias a otros scripts")]
+    public ControlCabeza scriptCabeza; // Arrastrá el Player acá en el Inspector
+
     [Header("Audio del Terremoto")]
     public AudioSource parlanteTerremoto;
 
     [Header("Fuerza del sismo")]
-    public float magnitudSismo = 20f; // Fuerza del empujón (Subile si no se mueven)
+    public float magnitudSismo = 20f; 
     private Rigidbody[] objetosAfectados; 
     public bool enZonaTerremoto = false;
     public MochilaEmergencia mochila;
+    
     [Header("Apagón")]
-    // Arrastrá acá las luces principales de la oficina (Directional Light, luces de techo, etc.)
     public GameObject[] lucesOficina;
+
+    [Header("Visuales de Refugio")]
+    public GameObject[] resaltadosVerdes; // <-- Arrastrá acá los objetos verdes
+    private bool sismoIniciado = false; 
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked; 
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
-        // 1. Llenamos el array automáticamente al iniciar el juego
-        // FindObjectsOfType busca CADA objeto en la escena que tenga Rigidbody
         objetosAfectados = FindObjectsOfType<Rigidbody>();
         
-        // Debug para que veas en consola cuántos encontró
-        Debug.Log("Se encontraron " + objetosAfectados.Length + " objetos físicos.");
+        // Empezamos con las zonas verdes apagadas
+        ApagarResaltados();
     }
 
     void Update()
     {
-        // Mantené apretada la T para el sismo
         if ((Input.GetKey(KeyCode.T) || enZonaTerremoto) && mochila.getMochilardaLista())
         {
+            // --- NUEVO: PRENDER RESALTADOS AL EMPEZAR ---
+            if (!sismoIniciado)
+            {
+                sismoIniciado = true;
+                PrenderResaltados();
+            }
             Temblar();
         }
     }
 
     void Temblar()
     {
-        // 2. Recorremos la lista uno por uno
         foreach (Rigidbody rb in objetosAfectados)
         {
-             // Si el objeto es "Kinematic" (como quizás tu mano), no lo empujamos
              if(rb.isKinematic) continue;
-
-             // 3. Vector random (X, Y, Z) entre -1 y 1
              Vector3 direccionRandom = Random.insideUnitSphere;
-             
-             // 4. Aplanamos la fuerza (Sismo horizontal)
              direccionRandom.y = 0; 
-             // Normalizamos para que la dirección mida 1, y multiplicamos por magnitud
              Vector3 fuerzaFinal = direccionRandom.normalized * magnitudSismo;
-
-             // 5. Aplicamos la fuerza. 
-             // ForceMode.Force es continuo (como viento o empuje constante)
-             // ForceMode.Impulse es golpes (como martillazos). Probá ambos.
              rb.AddForce(fuerzaFinal, ForceMode.Impulse);
         }
     }
-    public void IniciarSonido()
-    {
-        // Chequeamos que exista el parlante y que no esté sonando ya
-        if (parlanteTerremoto != null && !parlanteTerremoto.isPlaying)
-        {
-            parlanteTerremoto.Play();
-        }
-    }
 
-    public void FrenarSonido()
+    public void IniciarSonido() { if (parlanteTerremoto != null && !parlanteTerremoto.isPlaying) parlanteTerremoto.Play(); }
+    public void FrenarSonido() { if (parlanteTerremoto != null) parlanteTerremoto.Stop(); }
+
+    public void PrenderResaltados() { foreach (GameObject obj in resaltadosVerdes) if (obj != null) obj.SetActive(true); }
+    public void ApagarResaltados() { foreach (GameObject obj in resaltadosVerdes) if (obj != null) obj.SetActive(false); }
+
+    [Header("Configuración Réplica")]
+    public float magnitudReplica = 8.0f; // Más suave que el sismo principal
+
+    public void ProgramarReplica(float tiempoDeEspera)
     {
-        if (parlanteTerremoto != null)
+        StartCoroutine(RutinaReplica(tiempoDeEspera));
+    }
+    IEnumerator RutinaReplica(float espera)
+    {
+        Debug.Log($"Esperando {espera} segundos para la réplica...");
+        yield return new WaitForSeconds(espera);
+
+        Debug.Log("⚠️ ¡RÉPLICA INICIADA!");
+        
+        // 1. Guardamos las magnitudes originales para no perderlas
+        float magnitudFisicaOriginal = magnitudSismo;
+        float magnitudCamaraOriginal = 0f;
+        
+        if (scriptCabeza != null) 
         {
-            parlanteTerremoto.Stop(); // La función Stop() corta el audio instantáneamente
+            magnitudCamaraOriginal = scriptCabeza.magnitudSismo;
+            
+            // 2. Le aplicamos la magnitud suave a la cámara y LA PRENDEMOS
+            scriptCabeza.magnitudSismo = magnitudReplicaCamara;
+            scriptCabeza.haySismo = true; 
         }
+
+        // 3. Le aplicamos la magnitud suave a los muebles, prendemos sismo físico y sonido
+        magnitudSismo = magnitudReplicaFisica;
+        enZonaTerremoto = true;
+        IniciarSonido();
+
+        // 4. Duración de la réplica
+        yield return new WaitForSeconds(4f); 
+
+        // 5. Apagamos todo
+        enZonaTerremoto = false;
+        FrenarSonido();
+        
+        // 6. Restauramos los valores originales para que quede limpio
+        magnitudSismo = magnitudFisicaOriginal; 
+        if (scriptCabeza != null) 
+        {
+            scriptCabeza.haySismo = false; // APAGAMOS LA CÁMARA
+            scriptCabeza.magnitudSismo = magnitudCamaraOriginal; 
+        }
+        
+        Debug.Log("✅ Réplica terminada.");
     }
 }

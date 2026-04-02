@@ -83,6 +83,26 @@ public class ValvulaInteractiva : MonoBehaviour
         estaCerrada = true;
         estaAnimando = false;
         Debug.Log("✅ Válvula asegurada.");
+        // --- NUEVO: CHEQUEO GLOBAL DE VÁLVULAS ---
+        // Buscamos todas las válvulas que hay en la escena
+        ValvulaInteractiva[] todasLasValvulas = FindObjectsOfType<ValvulaInteractiva>();
+        bool todasCerradas = true;
+
+        foreach (ValvulaInteractiva v in todasLasValvulas)
+        {
+            if (!v.estaCerrada) 
+            {
+                todasCerradas = false;
+                break; // Si encuentra una abierta, corta la búsqueda
+            }
+        }
+
+        // Si el ciclo terminó y todas estaban cerradas, ¡damos los puntos!
+        if (todasCerradas)
+        {
+            GestorObjetivos gestor = FindObjectOfType<GestorObjetivos>();
+            if (gestor != null) gestor.MarcarObjetivo("Valvulas");
+        }
     }
 
     IEnumerator TitilarEmission()

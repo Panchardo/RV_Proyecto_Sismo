@@ -8,8 +8,8 @@ public class GestorObjetivos : MonoBehaviour
 
     [System.Serializable]
     public class Objetivo {
-        public string id; // Nombre interno (ej: "Gas")
-        public string nombrePantalla; // Lo que lee el usuario
+        public string id; 
+        public string nombrePantalla; 
         public int puntos;
         public bool completado = false;
     }
@@ -19,7 +19,7 @@ public class GestorObjetivos : MonoBehaviour
 
     void Start() {
         gestor = GetComponent<GestorJuego>();
-        ActualizarUI();
+   //     ActualizarUI();
     }
 
     public void MarcarObjetivo(string id) {
@@ -27,8 +27,8 @@ public class GestorObjetivos : MonoBehaviour
             if (obj.id == id && !obj.completado) {
                 obj.completado = true;
                 gestor.SumarPuntos(obj.puntos);
-                ActualizarUI();
-                break;
+ //               ActualizarUI();
+ //               break;
             }
         }
     }

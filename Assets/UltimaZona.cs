@@ -26,6 +26,7 @@ public class UltimaZona : MonoBehaviour
             ApagarEfectoVisual();
             if (gestor != null)
             {
+                FindObjectOfType<GestorObjetivos>().MarcarObjetivo("ZonaSegura");
                 gestor.TerminarSimulacion();
             }
         }

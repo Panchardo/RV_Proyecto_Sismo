@@ -120,17 +120,17 @@ public class GiroscopioKickstart : MonoBehaviour
 
         // Información de Debug General
         GUI.color = Color.white;
-        GUILayout.Label("Soporte Gyro: " + SystemInfo.supportsGyroscope);
+//        GUILayout.Label("Soporte Gyro: " + SystemInfo.supportsGyroscope);
         
         if (Application.isEditor)
         {
             GUI.color = Color.yellow;
-            GUILayout.Label("MODO: Testeo con Joystick/Mouse");
+//            GUILayout.Label("MODO: Testeo con Joystick/Mouse");
         }
         else
         {
             GUI.color = sensorActivo ? Color.green : Color.red;
-            GUILayout.Label("Sensor Status: " + (sensorActivo ? "VIVO" : "APAGADO"));
+//            GUILayout.Label("Sensor Status: " + (sensorActivo ? "VIVO" : "APAGADO"));
         }
 
         // Mostrar mensaje del L3 si la corrutina lo activa

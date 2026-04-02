@@ -1,38 +1,74 @@
 using UnityEngine;
+using System.Collections;
 
-public class TableroElectrico : MonoBehaviour
+public class TermicaInteractiva : MonoBehaviour
 {
-    [Header("Componentes Visuales")]
-    public Transform palanca; // Arrastrá acá el cubito de la palanca
-    public float anguloRotacion = 50f; // Cuánto baja la térmica
+    private Renderer[] todosLosRenderers;
+    private bool emergenciaActivada = false;
+    private bool estaApagada = false;
+    private Coroutine corrutinaTitileo;
 
-    [Header("Sistema Eléctrico")]
-    public Light[] lucesOficina; // Arrastrá todas las luces de tu oficina acá
-    
-    [Header("Gestión de Escena")]
-    //public GestorDeMundos gestorEscenarios; // El script que armamos antes
+    [Header("Configuración Visual")]
+    [ColorUsage(true, true)]
+    public Color colorAlerta = new Color(0f, 1f, 0f, 1f); // Verde
 
-    private bool yaSeCorto = false;
-
-    // Esta función la llamaremos desde tu script de Agarrar
-    public void AccionarTermica()
+    void Start()
     {
-        if (yaSeCorto) return;
+        // Buscamos todos los componentes que pueden brillar en el modelo GLB
+        todosLosRenderers = GetComponentsInChildren<Renderer>();
+        ApagarBrillo();
+    }
 
-        // 1. Efecto Mecánico: Rotamos la palanca hacia abajo
-        palanca.localRotation = Quaternion.Euler(anguloRotacion, 0, 0);
-
-        // 2. Efecto Eléctrico: Apagamos el array de luces
-        foreach (Light luz in lucesOficina)
+    public void IniciarAlertaEmergencia()
+    {
+        emergenciaActivada = true;
+        if (todosLosRenderers.Length > 0)
         {
-            if (luz != null) luz.enabled = false;
+            corrutinaTitileo = StartCoroutine(TitilarEmission());
+        }
+    }
+
+    // Esta es la función que debés llamar con tu sistema de interacción (Fire1)
+    public void Interactuar()
+    {
+        if (emergenciaActivada && !estaApagada)
+        {
+            estaApagada = true;
+            if (corrutinaTitileo != null) StopCoroutine(corrutinaTitileo);
+            ApagarBrillo();
+
+            // La línea que solicitaste para los puntos
+            FindObjectOfType<GestorObjetivos>().MarcarObjetivo("Termica");
+            Debug.Log("🔌 Térmica desactivada. Puntos sumados.");
+        }
+    }
+
+    IEnumerator TitilarEmission()
+    {
+        foreach (Renderer ren in todosLosRenderers)
+        {
+            ren.material.EnableKeyword("_EMISSION");
         }
 
-        yaSeCorto = true;
-        Debug.Log("Suministro eléctrico cortado. Protocolo de evacuación iniciado.");
+        while (!estaApagada)
+        {
+            float intensidad = (Mathf.Sin(Time.time * 4f) + 1f) / 2f;
+            Color colorActual = colorAlerta * (intensidad * 2f);
 
-        // 3. (Opcional) Avisamos al gestor que ya podemos salir
-        // Si querés que el cambio de mundo sea automático al cortar la luz:
-        // if (gestorEscenarios != null) gestorEscenarios.ActivarEvacuacion();
+            foreach (Renderer ren in todosLosRenderers)
+            {
+                ren.material.SetColor("_EmissionColor", colorActual);
+            }
+            yield return null;
+        }
+    }
+
+    void ApagarBrillo()
+    {
+        foreach (Renderer ren in todosLosRenderers)
+        {
+            ren.material.SetColor("_EmissionColor", Color.black);
+            ren.material.DisableKeyword("_EMISSION");
+        }
     }
 }

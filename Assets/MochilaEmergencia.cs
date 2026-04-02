@@ -41,6 +41,7 @@ public class MochilaEmergencia : MonoBehaviour
 
         if (itemsRecolectados >= totalItems)
         {
+            
             activarResaltado = true;
             Debug.Log("¡Items listos! Interactuá con la mochila para guardarlos.");
         }
@@ -55,6 +56,7 @@ public class MochilaEmergencia : MonoBehaviour
             mochilaLista = true;
             activarResaltado = false;
             mat.SetColor("_EmissionColor", Color.black); 
+            FindObjectOfType<GestorObjetivos>().MarcarObjetivo("Mochila");
             Debug.Log("Mochila equipada. Ve a tu cubículo.");
             cubiculo.renderizadorZona.enabled = true;
             cubiculo.ActualizarColorZona();
@@ -78,6 +80,7 @@ public class MochilaEmergencia : MonoBehaviour
     }
 
     public bool getMochilardaLista(){
+        
         return mochilaLista;
     }
 

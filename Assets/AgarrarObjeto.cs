@@ -98,10 +98,16 @@ public class AgarrarObjeto : MonoBehaviour
                 valvula.CerrarValvula(); 
                 return; 
             }
-            // --- NUEVO: LÓGICA DE PANTALLA TÁCTIL ---
+      
             if (hit.collider.TryGetComponent(out PanelDialogo pantalla))
             {
                 pantalla.AvanzarDialogo(); 
+                return; 
+            }
+ 
+            if (hit.collider.TryGetComponent(out TermicaInteractiva termica))
+            {
+                termica.Interactuar(); 
                 return; 
             }
 
@@ -116,12 +122,7 @@ public class AgarrarObjeto : MonoBehaviour
                 objetoAgarrado.layer = 2; // Lo pasa a Ignore Raycast
                 rbObjeto.isKinematic = true; 
             }
-            // --- DETECCIÓN DE TÉRMICA ---
-            if (hit.collider.TryGetComponent(out TableroElectrico tablero))
-            {
-                tablero.AccionarTermica(); // ¡Bajamos la térmica!
-                return; 
-            }
+    
         }
     }
 
