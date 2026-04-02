@@ -5941,6 +5941,25 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1108219987}
   m_SourcePrefab: {fileID: 100100000, guid: ec9f1d628d275974dab15260848fefbd, type: 3}
+--- !u!1 &1001982027 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 496607101550281126, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+  m_PrefabInstance: {fileID: 4265960196612775633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1001982032
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1001982027}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da6f731ef656bb84cb3c10c12dcda596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idObjetivo: Mesa_Refugio
+  esZonaFinal: 0
 --- !u!1 &1023867547 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1279140426991430450, guid: 360690a7c06559a4f927c76899139848, type: 3}
@@ -6670,6 +6689,25 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6ebfc6898dc70814c86bb78d43e72a9c, type: 3}
+--- !u!1 &1171302826 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 961067196878546273, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+  m_PrefabInstance: {fileID: 4265960196612775633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1171302831
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1171302826}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da6f731ef656bb84cb3c10c12dcda596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idObjetivo: Mesa_Refugio
+  esZonaFinal: 0
 --- !u!4 &1182253957 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1839106727638412506, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
@@ -7381,6 +7419,25 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 416952897058315524, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
   m_PrefabInstance: {fileID: 4265960196612775633}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1277845821 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5032948340733583898, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+  m_PrefabInstance: {fileID: 4265960196612775633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1277845826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1277845821}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da6f731ef656bb84cb3c10c12dcda596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idObjetivo: Puerta_refugio
+  esZonaFinal: 0
 --- !u!1001 &1301630768
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9617,6 +9674,25 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 040b0e4d147341b4780f162c4ecef39c, type: 3}
+--- !u!1 &1811138030 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5546400898006103145, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+  m_PrefabInstance: {fileID: 4265960196612775633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1811138035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1811138030}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da6f731ef656bb84cb3c10c12dcda596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idObjetivo: Mesa_Refugio
+  esZonaFinal: 0
 --- !u!1 &1816622488
 GameObject:
   m_ObjectHideFlags: 0
@@ -10484,6 +10560,25 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2224b63330275e5478ef024b2913f937, type: 3}
+--- !u!1 &1915771367 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2599178972334530748, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+  m_PrefabInstance: {fileID: 4265960196612775633}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1915771372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1915771367}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da6f731ef656bb84cb3c10c12dcda596, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  idObjetivo: 
+  esZonaFinal: 0
 --- !u!1001 &1921999998
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -10741,6 +10836,70 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6825a3fe8a1605f42a0d0589e582ac40, type: 3}
+--- !u!1 &1973009980
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1973009981}
+  - component: {fileID: 1973009983}
+  - component: {fileID: 1973009982}
+  m_Layer: 0
+  m_Name: GestorJuego
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1973009981
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973009980}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -9.686048, y: -3.7945988, z: -14.177231}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1037131178}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1973009982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973009980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a675a8d01106954e8002b81c8050bc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  textoListaUI: {fileID: 0}
+  objetivos: []
+--- !u!114 &1973009983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973009980}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7068736071563145a9918a43bba5dbe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  puntajeActual: 0
+  tiempoJugado: 0
+  grupoPantallaNegra: {fileID: 0}
+  textoFinal: {fileID: 0}
+  velocidadFade: 1
 --- !u!1001 &1978163897
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12247,6 +12406,9 @@ PrefabInstance:
       addedObject: {fileID: 386760000}
     - targetCorrespondingSourceObject: {fileID: 7715227775651794093, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 1973009981}
+    - targetCorrespondingSourceObject: {fileID: 7715227775651794093, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1889186651}
     - targetCorrespondingSourceObject: {fileID: 7715227775651794093, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       insertIndex: -1
@@ -12300,6 +12462,21 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5511529498774303559, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2136970841}
+    - targetCorrespondingSourceObject: {fileID: 2599178972334530748, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1915771372}
+    - targetCorrespondingSourceObject: {fileID: 5032948340733583898, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1277845826}
+    - targetCorrespondingSourceObject: {fileID: 496607101550281126, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1001982032}
+    - targetCorrespondingSourceObject: {fileID: 5546400898006103145, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1811138035}
+    - targetCorrespondingSourceObject: {fileID: 961067196878546273, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1171302831}
     - targetCorrespondingSourceObject: {fileID: 774112699920611273, guid: 35369a567f2c0d248bcb9472ff20ea84, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1312597953}
